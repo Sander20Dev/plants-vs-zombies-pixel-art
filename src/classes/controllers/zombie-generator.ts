@@ -35,7 +35,7 @@ export default class ZombieGenerator extends GameObject {
     super(GameObjectTypes.UI, Vector2.ZERO)
     this.#waveController = new WaveGenerator(rows, zombies.zombies)
 
-    this.#normalTime = 40 * (zombies.difficultyPerWave + 1)
+    this.#normalTime = 60 + 30 * (zombies.difficultyPerWave + 1)
     this.#normalTimer = new Counter(this.#normalTime, () => {
       console.log('I want a wave!')
 
@@ -159,7 +159,7 @@ export default class ZombieGenerator extends GameObject {
         this.#generateAZombie(this.zombies.zombies[0].zombie)
       }
     } else {
-      const r = getRandomValue(15, 8)
+      const r = getRandomValue(25, 15)
       if (this.#counter >= r) {
         this.#counter -= r
         if (!this.#waveController.inWave && !this.waitingAWave) {

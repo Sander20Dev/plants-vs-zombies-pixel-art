@@ -2,9 +2,11 @@ import { canvas, ctx } from './classes/game-object'
 import { Views } from './loader'
 import { inputController } from './utilities/importants/input'
 import Time from './utilities/importants/time'
-import { audios } from './utilities/media-storage'
+import { audios, loadAllMedia } from './utilities/media-storage'
 
 let timer = 0
+
+let globalVolume = 0.5
 
 export let paused = false
 
@@ -22,7 +24,10 @@ function update(time: number) {
   Time.deltaTime = (Time.timeRate * (time - timer)) / 1000
   timer = time
 
-  audios.forEach((audio) => (audio.playbackRate = Time.timeRate))
+  audios.forEach((audio) => {
+    audio.playbackRate = Time.timeRate
+    audio.volume = globalVolume
+  })
   ctx.clearRect(0, 0, canvas.width, canvas.height)
 
   const all = Views.all()
@@ -62,4 +67,7 @@ export function pauseGame() {
   Time.timeRate = 0
 }
 
-initGame()
+;(async () => {
+  await loadAllMedia()
+  initGame()
+})()

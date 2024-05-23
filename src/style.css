@@ -30,6 +30,7 @@ canvas {
   max-width: calc(100vh * 12 / 7);
   max-height: calc(100vw * 7 / 12);
 }
+#multimedia,
 #ui.disabled {
   display: none;
 }
