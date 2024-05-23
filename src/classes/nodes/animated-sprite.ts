@@ -57,7 +57,8 @@ export default class AnimatedSprite extends NodeAbs {
     this.currentAnimation = index
   }
 
-  onChange(currentAnimationIndex: number) {}
+  onChange(currentAnimationIndex: number): void
+  onChange() {}
 
   draw(filter?: string): void {
     if (filter) ctx.filter = filter

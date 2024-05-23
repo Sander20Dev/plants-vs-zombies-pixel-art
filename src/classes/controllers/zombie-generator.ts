@@ -137,7 +137,8 @@ export default class ZombieGenerator extends GameObject {
     }
   }
 
-  onEnd(bool: boolean) {}
+  onEnd(bool: boolean): void
+  onEnd() {}
 
   update() {
     this.#waveController.update()

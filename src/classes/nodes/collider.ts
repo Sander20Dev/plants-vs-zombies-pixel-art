@@ -56,8 +56,10 @@ export default class Collision extends NodeAbs {
       ) */
   }
 
-  onCollision(obj: GameObject) {}
-  onUpdate(obj?: GameObject) {}
+  onCollision(obj: GameObject): void
+  onCollision() {}
+  onUpdate(obj?: GameObject): void
+  onUpdate() {}
 
   update() {
     if (this.mesh != null) {

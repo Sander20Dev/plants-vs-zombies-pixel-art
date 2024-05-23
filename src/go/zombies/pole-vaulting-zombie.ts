@@ -3,6 +3,7 @@ import AnimatedSpritesList from '../../classes/nodes/animated-sprites-list'
 import Vector2 from '../../classes/vector2'
 import { getCollide } from '../../utilities/collide'
 import { GameObjectTypes } from '../../utilities/enums'
+import Time from '../../utilities/importants/time'
 import Plant from '../plants/plant'
 import Zombie, { ZOMBIE_SPEED } from './_zombie'
 import AnimationObject from './animations/_animation'
@@ -166,18 +167,18 @@ export default class PoleVaultingZombie extends Zombie {
 
   nodes: AnimatedSpritesList[] = [this.animationList]
 
-  onUpdate = (delta: number) => {
+  onUpdate = () => {
     this.detectCollision()
     if (!this.jumped) {
       if (this.velocity === 'very-fast') {
-        this.transform.x -= ZOMBIE_SPEED * 4 * delta
+        this.transform.x -= ZOMBIE_SPEED * 4 * Time.deltaTime
       } else if (this.velocity === 'fast') {
-        this.transform.x -= ZOMBIE_SPEED * 1.8 * delta
+        this.transform.x -= ZOMBIE_SPEED * 1.8 * Time.deltaTime
       } else if (this.velocity === 'normal') {
-        this.transform.x -= ZOMBIE_SPEED * delta
+        this.transform.x -= ZOMBIE_SPEED * Time.deltaTime
       }
     } else {
-      super.onUpdate(delta)
+      super.onUpdate()
     }
   }
 }
