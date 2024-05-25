@@ -103,15 +103,15 @@ export const defaultLoadingSeeds = {
     current: 0,
   },
   [PLANTS.SNOW_PEA]: {
-    timeout: 40,
+    timeout: 15,
     current: 0,
   },
   [PLANTS.CHOMPER]: {
-    timeout: 40,
+    timeout: 30,
     current: 0,
   },
   [PLANTS.REAPEATER]: {
-    timeout: 40,
+    timeout: 15,
     current: 0,
   },
 }
