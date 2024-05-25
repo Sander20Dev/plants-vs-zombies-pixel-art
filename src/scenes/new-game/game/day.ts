@@ -1,7 +1,6 @@
 import { PLANTS } from '../../../utilities/enums/plants'
 import { ZOMBIES } from '../../../utilities/enums/zombie'
 import DayMap from '../../adventure-mode/day/_day'
-import Lobby from '../../lobby'
 
 export enum DIFFICULTY {
   EASY,

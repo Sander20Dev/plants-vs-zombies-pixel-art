@@ -1,4 +1,3 @@
-import { GameObject } from '../../classes/game-object'
 import AnimatedSpritesList from '../../classes/nodes/animated-sprites-list'
 import Vector2 from '../../classes/vector2'
 import { getCollide } from '../../utilities/collide'
