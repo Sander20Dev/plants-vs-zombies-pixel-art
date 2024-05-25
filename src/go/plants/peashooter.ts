@@ -39,7 +39,7 @@ export default class Peashooter extends Plant {
       '/sprites/plants/peashooter/idle3.png',
       // '/sprites/plants/peashooter/attack.png',
     ],
-    2
+    4
   )
 
   nodes = [this.#animation]
@@ -74,8 +74,8 @@ export default class Peashooter extends Plant {
   }
 }
 
-export const PEA_VELOCITY = 125
-export const PEA_DAMAGE = 30
+export const PEA_VELOCITY = 100
+export const PEA_DAMAGE = 20
 
 class PeaProjectil extends GameObject {
   #audioList = {

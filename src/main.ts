@@ -1,3 +1,4 @@
 import './style.css'
 import './go'
-import './update'
+import initGame from './update'
+initGame()

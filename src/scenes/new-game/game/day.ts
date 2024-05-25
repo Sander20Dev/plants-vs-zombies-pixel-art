@@ -1,6 +1,7 @@
 import { PLANTS } from '../../../utilities/enums/plants'
 import { ZOMBIES } from '../../../utilities/enums/zombie'
 import DayMap from '../../adventure-mode/day/_day'
+import Lobby from '../../lobby'
 
 export enum DIFFICULTY {
   EASY,
@@ -72,7 +73,6 @@ export default class Day extends DayMap {
               zombie: ZOMBIES.BUCKETHEAD_ZOMBIE,
             },
           ],
-      undefined,
       difficulty + 1
     )
   }

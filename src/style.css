@@ -9,6 +9,7 @@ body {
   place-content: center;
   overflow: hidden;
   height: 100vh;
+  background-color: black;
 }
 
 canvas {
@@ -33,4 +34,13 @@ canvas {
 #multimedia,
 #ui.disabled {
   display: none;
+}
+
+@keyframes spin {
+  from {
+    transform: rotateZ(0deg);
+  }
+  to {
+    transform: rotateZ(360deg);
+  }
 }

@@ -10,9 +10,12 @@ import { clearAudios } from '../utilities/media-storage'
 
 class ScenesManager {
   currentScene: typeof Scene | null = null
+  lastProps: unknown[] | null = null
 
   reloadScene() {
-    if (this.currentScene) this.changeScene(this.currentScene)
+    if (this.currentScene) {
+      this.changeScene(this.currentScene, this.lastProps ?? undefined)
+    }
   }
 
   changeScene<T extends typeof Scene>(scene: T, props: unknown[] = []) {
@@ -34,6 +37,7 @@ class ScenesManager {
 
     new scene(...(props as ConstructorParameters<typeof Scene>))
     this.currentScene = scene
+    this.lastProps = props
   }
 }
 

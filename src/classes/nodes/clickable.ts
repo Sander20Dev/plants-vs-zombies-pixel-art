@@ -1,4 +1,4 @@
-import { paused } from '../../update'
+import Time from '../../utilities/importants/time'
 import { canvas } from '../game-object'
 import Vector2 from '../vector2'
 import NodeAbs from './node'
@@ -14,7 +14,7 @@ canvas.addEventListener('click', (ev) => {
   let detect = false
 
   for (const click of clicker) {
-    if (paused && !click.invulnerable) return
+    if (Time.timeRate === 0 && !click.invulnerable) return
     click.onMouseOver()
     if (
       !detect &&
@@ -35,7 +35,7 @@ canvas.addEventListener('mousedown', (ev) => {
   const y = Math.floor((canvas.height * (ev.pageY - rect.y)) / rect.height)
 
   for (const click of clicker) {
-    if (paused && !click.invulnerable) return
+    if (Time.timeRate === 0 && !click.invulnerable) return
     if (click.onActive == null) continue
 
     if (

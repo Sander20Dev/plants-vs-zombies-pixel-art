@@ -40,7 +40,7 @@ export default class SnowPea extends Plant {
       '/sprites/plants/snow-pea/idle3.png',
       // '/sprites/plants/snow-pea/attack.png',
     ],
-    2
+    4
   )
 
   nodes = [this.#animation]

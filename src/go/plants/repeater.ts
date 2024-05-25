@@ -36,7 +36,7 @@ export default class Repeater extends Plant {
           '/sprites/plants/repeater/idle1.png',
           '/sprites/plants/repeater/idle3.png',
         ],
-        fps: 2,
+        fps: 4,
         loop: false,
       },
       attack: {

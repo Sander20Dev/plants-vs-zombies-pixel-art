@@ -10,6 +10,15 @@ import Headless, { Fired } from './animations/headless'
 import ZombieArm from './animations/zombie-arm'
 
 export const zombieAnimation = {
+  'z-normal-eat': {
+    srcs: [
+      '/sprites/zombies/zombie/eat-1.png',
+      '/sprites/zombies/zombie/eat-2.png',
+      '/sprites/zombies/zombie/eat-1.png',
+      '/sprites/zombies/zombie/eat-3.png',
+    ],
+    fps: 4,
+  },
   'z-normal': {
     srcs: [
       '/sprites/zombies/zombie/walking-1.png',
@@ -18,6 +27,15 @@ export const zombieAnimation = {
       '/sprites/zombies/zombie/walking-2.png',
     ],
     fps: 5,
+  },
+  'z-arm-eat': {
+    srcs: [
+      '/sprites/zombies/zombie/eat-middle-1.png',
+      '/sprites/zombies/zombie/eat-middle-2.png',
+      '/sprites/zombies/zombie/eat-middle-1.png',
+      '/sprites/zombies/zombie/eat-middle-2.png',
+    ],
+    fps: 4,
   },
   'z-arm': {
     srcs: [
@@ -33,6 +51,14 @@ export const zombieAnimation = {
 export const ZOMBIE_SPEED = 4
 
 export default class Zombie extends Entity {
+  noEat = false
+
+  init() {
+    this.animationList.onChangeAnimation = (c) => this.onChangeAnimation(c)
+  }
+
+  currentAnimation = 'z-normal'
+
   constructor(pos: Vector2, health: number, damage = 100) {
     super(GameObjectTypes.ZOMBIE, pos, health, damage)
 
@@ -41,14 +67,24 @@ export default class Zombie extends Entity {
     }
 
     this.collision.onUpdate = (plant) => {
-      if (plant === this.plantToEat) return
-      if (plant != null) {
-        if (!(plant instanceof Plant)) return
-        this.plantToEat = plant
+      if (this.noEat) return
+
+      if (plant instanceof Plant) {
+        this.eatPlant(plant)
       } else {
-        this.plantToEat = null
+        this.animationList.setCurrentAnimation(this.currentAnimation, true)
+        this.transform.x -= ZOMBIE_SPEED * Time.deltaTime
       }
+
+      // if (plant === this.plantToEat) return
+      // if (plant != null) {
+      //   if (!(plant instanceof Plant)) return
+      //   this.plantToEat = plant
+      // } else {
+      //   this.plantToEat = null
+      // }
     }
+    this.init()
   }
 
   #audioList = {
@@ -65,6 +101,7 @@ export default class Zombie extends Entity {
   effects = new Effects(5, 5)
 
   #onSetCold(cold: boolean) {
+    this.localTimeRate = cold ? 0.5 : 1
     this.animationList.filters = cold
       ? 'sepia(1) hue-rotate(190deg) saturate(0.5)'
       : 'none'
@@ -86,20 +123,23 @@ export default class Zombie extends Entity {
 
   nodes = [this.animationList]
 
-  #noArm = false
-
   setAnimation() {
     if (this.health > 90) {
-      this.animationList.setCurrentAnimation('z-normal')
+      this.currentAnimation = 'z-normal'
       return
     }
 
-    if (!this.#noArm) {
-      new ZombieArm(this.transform.add(Vector2.ZERO))
-      this.#noArm = true
-    }
-    this.animationList.setCurrentAnimation('z-arm')
+    this.currentAnimation = 'z-arm'
   }
+
+  hasArm = true
+  onChangeAnimation(currentAnimation: string) {
+    if (this.hasArm && currentAnimation.includes('z-arm')) {
+      this.hasArm = false
+      new ZombieArm(this.transform.add(Vector2.ZERO))
+    }
+  }
+
   zombieGroan() {
     this.#groanCounter += Time.deltaTime
     if (this.#groanCounter >= 2) {
@@ -131,26 +171,39 @@ export default class Zombie extends Entity {
     this.setAnimation()
   }
 
-  #eatCounter = 0
-  eatPlant() {
-    if (this.plantToEat == null) {
-      this.transform.x -= ZOMBIE_SPEED * Time.deltaTime
-    } else {
-      this.#eatCounter += Time.deltaTime
-      if (this.#eatCounter >= 1) {
-        this.#eatCounter -= 1
-        if (Math.random() < 0.5) {
-          this.#audioList.chomp.play()
-        } else {
-          this.#audioList.chomp2.play()
-        }
-        this.plantToEat.attack(100)
+  eatPlant(plant: Plant) {
+    // if (this.plantToEat == null) {
+    //   this.transform.x -= ZOMBIE_SPEED * Time.deltaTime
+    // } else {
+    console.log(this.currentAnimation)
+
+    this.animationList.animations[this.currentAnimation + '-eat'].onChange = (
+      i
+    ) => {
+      if (i === 1 || i === 3) return
+      if (Math.random() < 0.5) {
+        this.#audioList.chomp.play()
+      } else {
+        this.#audioList.chomp2.play()
       }
+      plant.attack(50)
     }
+    this.animationList.setCurrentAnimation(this.currentAnimation + '-eat', true)
+    // this.#eatCounter += Time.deltaTime
+    // if (this.#eatCounter >= 1) {
+    //   this.#eatCounter -= 1
+    //   if (Math.random() < 0.5) {
+    //     this.#audioList.chomp.play()
+    //   } else {
+    //     this.#audioList.chomp2.play()
+    //   }
+    //   this.plantToEat.attack(100)
+    // }
+    // }
   }
 
   onUpdate() {
-    this.eatPlant()
+    // this.eatPlant()
   }
 
   update(): void {

@@ -9,7 +9,7 @@ import { Views } from '../../loader'
 import { scenes } from '../../manager/scenes-manager'
 import NewPlantScene from '../../scenes/adventure-mode/new-plant'
 import { selectedPlant, suns } from '../../states'
-import start, { pauseGame } from '../../update'
+import { pauseGame } from '../../update'
 import { GameObjectTypes } from '../../utilities/enums'
 import {
   PLANTS,
@@ -174,7 +174,7 @@ class NewPlant extends GameObject {
     }
     this.audios.winMusic.audio.onended = () => {
       scenes.changeScene(A)
-      start()
+      Time.timeRate = 1
     }
   }
 

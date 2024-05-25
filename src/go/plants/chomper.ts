@@ -8,6 +8,18 @@ import { PLANTS } from '../../utilities/enums/plants'
 import Zombie from '../zombies/_zombie'
 import Plant from './plant'
 
+const collidePerIndex = [
+  { rel: new Vector2(6, 2), size: new Vector2(8, 10) },
+  { rel: new Vector2(4, 1), size: new Vector2(11, 7) },
+  { rel: new Vector2(3, 1), size: new Vector2(9, 8) },
+  { rel: new Vector2(7, 1), size: new Vector2(7, 9) },
+  { rel: new Vector2(9, 2), size: new Vector2(7, 9) },
+  { rel: new Vector2(11, 2), size: new Vector2(7, 9) },
+  { rel: new Vector2(14, 0), size: new Vector2(7, 9) },
+  { rel: new Vector2(18, 0), size: new Vector2(7, 9) },
+  { rel: new Vector2(23, 2), size: new Vector2(7, 9) },
+]
+
 const chomperAnimation = {
   idle: {
     srcs: [
@@ -29,8 +41,6 @@ const chomperAnimation = {
       '/sprites/plants/chomper/prepare-to-eat-7.png',
       '/sprites/plants/chomper/prepare-to-eat-8.png',
       '/sprites/plants/chomper/prepare-to-eat-9.png',
-      '/sprites/plants/chomper/prepare-to-eat-10.png',
-      '/sprites/plants/chomper/prepare-to-eat-11.png',
     ],
     fps: 5,
     loop: false,
@@ -46,8 +56,6 @@ const chomperAnimation = {
       '/sprites/plants/chomper/init-eat-7.png',
       '/sprites/plants/chomper/init-eat-8.png',
       '/sprites/plants/chomper/init-eat-9.png',
-      '/sprites/plants/chomper/init-eat-10.png',
-      '/sprites/plants/chomper/init-eat-11.png',
     ],
     fps: 5,
     loop: false,
@@ -93,8 +101,8 @@ export default class Chomper extends Plant {
   )
 
   detectEatZone = {
-    from: new Vector2(12, 0),
-    to: new Vector2(28, 16),
+    rel: new Vector2(8, 0),
+    size: new Vector2(24, 16),
   }
 
   nodes = [this.animationList]
@@ -107,6 +115,7 @@ export default class Chomper extends Plant {
 
   #canEat = true
   #counter = new Counter(42, () => this.endToEat())
+  #detectedZombie: Zombie | null = null
 
   endToEat() {
     this.animationList.setCurrentAnimation('recharge', true)
@@ -116,12 +125,35 @@ export default class Chomper extends Plant {
     }
   }
 
-  eatZombie(zombie: Zombie) {
+  eatZombie() {
+    if (this.#detectedZombie == null) return
     this.#canEat = false
     this.animationList.setCurrentAnimation('prepare-to-eat', true)
+
+    this.animationList.animations['prepare-to-eat'].onChange = (index) => {
+      if (this.#detectedZombie == null) return
+
+      if (
+        !this.#detectedZombie.collision.detectCollision(
+          this.transform.add(collidePerIndex[index].rel),
+          this.transform
+            .add(collidePerIndex[index].rel)
+            .add(collidePerIndex[index].size)
+        )
+      )
+        return
+
+      this.animationList.setCurrentAnimation('init-eat', true, {
+        animationIndex: 8 - index,
+      })
+      this.#detectedZombie.attack(this.damage, 'no-body')
+    }
+
     this.animationList.animations['prepare-to-eat'].onEnd = () => {
+      if (this.#detectedZombie == null) return
+
       this.animationList.setCurrentAnimation('init-eat', true)
-      zombie.attack(this.damage, 'no-body')
+      this.#detectedZombie.attack(this.damage, 'no-body')
     }
     this.animationList.animations['init-eat'].onEnd = () => {
       this.animationList.setCurrentAnimation('idle-eat', true)
@@ -131,19 +163,21 @@ export default class Chomper extends Plant {
 
   detectZombie() {
     const zombies = getCollide(
-      this.transform.x + this.detectEatZone.from.x,
+      this.transform.x + this.detectEatZone.rel.x,
       this.transform.y,
-      this.detectEatZone.to.x,
-      this.detectEatZone.to.y,
+      this.detectEatZone.size.x,
+      this.detectEatZone.size.y,
       GameObjectTypes.ZOMBIE
     ).filter((n) => n instanceof Zombie) as Zombie[]
 
     if (zombies.length > 0) {
       if (zombies.length < 2) {
-        this.eatZombie(zombies[0])
+        this.#detectedZombie = zombies[0]
+        this.eatZombie()
       } else {
         zombies.sort((a, b) => b.transform.x - a.transform.x)
-        this.eatZombie(zombies[0])
+        this.#detectedZombie = zombies[0]
+        this.eatZombie()
       }
     }
   }

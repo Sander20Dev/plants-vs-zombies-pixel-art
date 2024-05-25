@@ -14,7 +14,6 @@ export default class DayMap extends Scene {
     rows: number,
     difficulty: number,
     zombies: { porcent: number; zombie: ZOMBIES; wave: number }[],
-    winnedPlant?: PLANTS,
     waves = 0
   ) {
     const zombieSpawner = new ZombieGenerator(
@@ -26,7 +25,7 @@ export default class DayMap extends Scene {
       rows
     )
 
-    const board = new Board(rows, winnedPlant)
+    const board = new Board(rows)
     const pauseButton = new Pause()
 
     zombieSpawner.onEnd = (bool) => board.setEnd(bool)

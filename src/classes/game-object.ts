@@ -8,6 +8,8 @@ export const canvas = document.querySelector('canvas')!
 export const ctx = canvas.getContext('2d')!
 
 export abstract class GameObject {
+  localTimeRate = 1
+
   hide = false
   transform = Vector2.ZERO
   collision = new Collision(this, Vector2.ZERO, Vector2.ZERO)

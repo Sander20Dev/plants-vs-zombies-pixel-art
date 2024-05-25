@@ -68,12 +68,30 @@ const poleVaultingZombieAnimation = {
     ],
     fps: 4,
   },
-  eat: {
+  'walking-eat': {
     srcs: [
       '/sprites/zombies/pole-vaulting-zombie/eat-1.png',
       '/sprites/zombies/pole-vaulting-zombie/eat-2.png',
       '/sprites/zombies/pole-vaulting-zombie/eat-1.png',
       '/sprites/zombies/pole-vaulting-zombie/eat-3.png',
+    ],
+    fps: 4,
+  },
+  middle: {
+    srcs: [
+      '/sprites/zombies/pole-vaulting-zombie/middle-1.png',
+      '/sprites/zombies/pole-vaulting-zombie/middle-2.png',
+      '/sprites/zombies/pole-vaulting-zombie/middle-1.png',
+      '/sprites/zombies/pole-vaulting-zombie/middle-3.png',
+    ],
+    fps: 4,
+  },
+  'middle-eat': {
+    srcs: [
+      '/sprites/zombies/pole-vaulting-zombie/eat-middle-1.png',
+      '/sprites/zombies/pole-vaulting-zombie/eat-middle-2.png',
+      '/sprites/zombies/pole-vaulting-zombie/eat-middle-1.png',
+      '/sprites/zombies/pole-vaulting-zombie/eat-middle-2.png',
     ],
     fps: 4,
   },
@@ -88,9 +106,7 @@ export default class PoleVaultingZombie extends Zombie {
   constructor(pos: Vector2) {
     super(pos, 335)
 
-    const onUpdate = this.collision.onUpdate
-
-    this.collision.onUpdate = () => {}
+    this.noEat = true
 
     this.animationList.currentAnimation.play()
     this.animationList.animations.jumping.onEnd = () => {
@@ -109,14 +125,16 @@ export default class PoleVaultingZombie extends Zombie {
       }
     }
     this.animationList.animations.fall.onEnd = () => {
-      this.#normalize(onUpdate)
+      this.#normalize()
     }
     this.animationList.animations.onAir.onChange = (index) => {
       if (index === 2) {
         new Stick(new Vector2(this.transform.x + 4, this.transform.y + 0))
       }
     }
-    this.animationList.animations.onAir.onEnd = () => this.#normalize(onUpdate)
+    this.animationList.animations.onAir.onEnd = () => this.#normalize()
+
+    this.init()
   }
 
   detectCollision() {
@@ -141,21 +159,30 @@ export default class PoleVaultingZombie extends Zombie {
     }
   }
 
-  #normalize(onUpdate: (obj?: GameObject | undefined) => void) {
+  setAnimation(): void {
+    if (this.health <= 90) {
+      if (this.currentAnimation === 'walking') {
+        this.currentAnimation = 'middle'
+      }
+    }
+  }
+
+  onChangeAnimation(currentAnimation: string): void {
+    if (this.hasArm && currentAnimation.includes('middle')) {
+      this.hasArm = false
+      new PoleVaultingArm(this.transform.add(Vector2.ZERO))
+    }
+  }
+
+  #normalize() {
     this.animationList.setCurrentAnimation('walking')
     this.animationList.animations.walking.play()
     this.collision.invulnerable = false
     this.velocity = 'normal'
     this.skip = false
     this.jumped = true
-    this.collision.onUpdate = (obj) => {
-      if (obj instanceof Plant) {
-        this.animationList.setCurrentAnimation('eat', true)
-      } else {
-        this.animationList.setCurrentAnimation('walking', true)
-      }
-      onUpdate(obj)
-    }
+    this.currentAnimation = 'walking'
+    this.noEat = false
   }
 
   animationList = new AnimatedSpritesList(
@@ -198,6 +225,28 @@ class Stick extends AnimationObject {
         '/sprites/zombies/pole-vaulting-zombie/stick-8.png',
         '/sprites/zombies/pole-vaulting-zombie/stick-9.png',
         '/sprites/zombies/pole-vaulting-zombie/stick-10.png',
+      ],
+      10,
+      new Vector2(16, 16),
+      { loop: false }
+    )
+  }
+}
+class PoleVaultingArm extends AnimationObject {
+  constructor(pos: Vector2) {
+    super(
+      pos,
+      [
+        '/sprites/zombies/arm/pole-vaulting-arm-falling-1.png',
+        '/sprites/zombies/arm/pole-vaulting-arm-falling-2.png',
+        '/sprites/zombies/arm/pole-vaulting-arm-falling-3.png',
+        '/sprites/zombies/arm/pole-vaulting-arm-falling-4.png',
+        '/sprites/zombies/arm/pole-vaulting-arm-falling-5.png',
+        '/sprites/zombies/arm/pole-vaulting-arm-falling-6.png',
+        '/sprites/zombies/arm/pole-vaulting-arm-falling-7.png',
+        '/sprites/zombies/arm/pole-vaulting-arm-falling-8.png',
+        '/sprites/zombies/arm/pole-vaulting-arm-falling-9.png',
+        '/sprites/zombies/arm/pole-vaulting-arm-falling-10.png',
       ],
       10,
       new Vector2(16, 16),

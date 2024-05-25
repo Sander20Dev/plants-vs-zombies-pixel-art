@@ -2,26 +2,24 @@ import { canvas, ctx } from './classes/game-object'
 import { Views } from './loader'
 import { inputController } from './utilities/importants/input'
 import Time from './utilities/importants/time'
-import { audios, loadAllMedia } from './utilities/media-storage'
+import { audios } from './utilities/media-storage'
 
 let timer = 0
 
 let globalVolume = 0.5
 
-export let paused = false
-
-function initGame() {
+export default function initGame() {
   window.requestAnimationFrame((time) => {
     timer = time
     window.requestAnimationFrame(update)
   })
 }
-export default function start() {
+export function start() {
   Time.timeRate = 1
 }
 
 function update(time: number) {
-  Time.deltaTime = (Time.timeRate * (time - timer)) / 1000
+  const delta = (time - timer) / 1000
   timer = time
 
   audios.forEach((audio) => {
@@ -37,7 +35,10 @@ function update(time: number) {
 
     if (gameObj.hide) continue
 
-    if (Time.timeRate !== 0) {
+    const timeRate = Time.timeRate * gameObj.localTimeRate
+    Time.deltaTime = delta * timeRate
+
+    if (timeRate !== 0) {
       gameObj.nodesUpdate(() => gameObj.collision.update())
     }
     gameObj.nodesUpdate(() => gameObj.collision.draw())
@@ -45,13 +46,13 @@ function update(time: number) {
     for (const node of gameObj.nodes) {
       if (node.ignore) continue
 
-      if (Time.timeRate !== 0) {
+      if (timeRate !== 0) {
         gameObj.nodesUpdate((tr) => node.update(tr))
       }
       gameObj.nodesUpdate(() => node.draw())
     }
 
-    if (Time.timeRate !== 0) {
+    if (timeRate !== 0) {
       gameObj.update()
     }
     gameObj.priority()
@@ -66,8 +67,3 @@ function update(time: number) {
 export function pauseGame() {
   Time.timeRate = 0
 }
-
-;(async () => {
-  await loadAllMedia()
-  initGame()
-})()

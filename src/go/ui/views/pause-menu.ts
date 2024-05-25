@@ -3,8 +3,9 @@ import Button from '../../../classes/game-objects/button'
 import Vector2 from '../../../classes/vector2'
 import { scenes } from '../../../manager/scenes-manager'
 import Lobby from '../../../scenes/lobby'
-import start, { pauseGame } from '../../../update'
+import { pauseGame } from '../../../update'
 import { GameObjectTypes } from '../../../utilities/enums'
+import Time from '../../../utilities/importants/time'
 import { getImage } from '../../../utilities/media-storage'
 
 const pauseView = getImage('/sprites/ui/views/pause-menu/menu.png')
@@ -22,9 +23,11 @@ export default class PauseMenu extends GameObject {
       this.play()
     })
     const r = new Restart(() => {
+      this.play()
       scenes.reloadScene()
     })
     const e = new Exit(() => {
+      this.play()
       scenes.changeScene(Lobby)
     })
 
@@ -32,7 +35,7 @@ export default class PauseMenu extends GameObject {
   }
 
   play() {
-    start()
+    Time.timeRate = 1
     this.hide = true
     this.arr.forEach((a) => (a.hide = true))
     this.destroy()
@@ -69,6 +72,7 @@ class Backdrop extends Button {
     this.onClick = () => {
       onClick()
     }
+    this.clickable.invulnerable = true
   }
 }
 
@@ -78,6 +82,7 @@ class Continue extends Button {
     this.onClick = () => {
       onClick()
     }
+    this.clickable.invulnerable = true
   }
 }
 class Restart extends Button {
@@ -86,6 +91,7 @@ class Restart extends Button {
     this.onClick = () => {
       onClick()
     }
+    this.clickable.invulnerable = true
   }
 }
 class Exit extends Button {
@@ -94,5 +100,6 @@ class Exit extends Button {
     this.onClick = () => {
       onClick()
     }
+    this.clickable.invulnerable = true
   }
 }

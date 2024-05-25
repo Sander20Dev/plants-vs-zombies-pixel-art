@@ -24,6 +24,10 @@ export class Views {
   }
 
   static clean() {
+    for (const gb of this.all()) {
+      gb.destroy()
+    }
+
     for (const key of Object.keys(gameObjects)) {
       gameObjects[+key as GameObjectTypes] = []
     }

@@ -10,6 +10,14 @@ export default class Pause extends Button {
       normal: '/sprites/ui/buttons/pause/normal.png',
       active: '/sprites/ui/buttons/pause/active.png',
     })
+    window.addEventListener('blur', this.blur)
+  }
+
+  blur = () => {
+    if (this.pause) return
+
+    this.pause = new PauseMenu()
+    this.pause.onPlay = () => (this.pause = undefined)
   }
 
   priority() {
@@ -28,5 +36,10 @@ export default class Pause extends Button {
       this.pause = new PauseMenu()
       this.pause.onPlay = () => (this.pause = undefined)
     }
+  }
+
+  destroy(): void {
+    window.removeEventListener('blur', this.blur)
+    super.destroy()
   }
 }

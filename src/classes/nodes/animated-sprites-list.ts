@@ -6,7 +6,7 @@ export default class AnimatedSpritesList extends NodeAbs {
   ignore = false
 
   animations
-  #currentAnimation
+  currentAnimationName
 
   constructor(
     transform: Vector2,
@@ -26,27 +26,36 @@ export default class AnimatedSpritesList extends NodeAbs {
         {}
       )
 
-    this.#currentAnimation = currentAnimation
+    this.currentAnimationName = currentAnimation
   }
+
+  onChangeAnimation(currentAnimation: string): void
+  onChangeAnimation() {}
 
   filters = 'none'
 
-  setCurrentAnimation(animationName: string, play = false) {
-    if (animationName === this.#currentAnimation) return
+  setCurrentAnimation(
+    animationName: string,
+    play = false,
+    { animationIndex = 0 } = {}
+  ) {
+    if (animationName === this.currentAnimationName) return
     if (this.animations[animationName] == null) return
-    this.#currentAnimation = animationName
-    this.animations[animationName].currentAnimation = 0
+    this.currentAnimationName = animationName
+    this.animations[animationName].currentAnimation = animationIndex
     if (play) this.animations[animationName].play()
+
+    this.onChangeAnimation(animationName)
   }
 
   get currentAnimation() {
-    return this.animations[this.#currentAnimation]
+    return this.animations[this.currentAnimationName]
   }
 
   draw(): void {
-    this.animations[this.#currentAnimation].draw(this.filters)
+    this.animations[this.currentAnimationName].draw(this.filters)
   }
   update(): void {
-    this.animations[this.#currentAnimation].update()
+    this.animations[this.currentAnimationName].update()
   }
 }
