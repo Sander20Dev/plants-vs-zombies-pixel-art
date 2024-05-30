@@ -1,16 +1,18 @@
-import { GameObject, canvas } from '../../classes/game-object'
+import { GameObject, canvas } from '../../game-engine/game-object'
 import { GameObjectTypes } from '../../utilities/enums'
-import AnimatedSprite from '../../classes/nodes/animated-sprite'
-import Collision from '../../classes/nodes/collider'
-import Sprite from '../../classes/nodes/sprite'
-import Vector2 from '../../classes/vector2'
+import AnimatedSprite from '../../game-engine/nodes/animated-sprite'
+import Collision from '../../game-engine/nodes/collider'
+import Sprite from '../../game-engine/nodes/sprite'
+import Vector2 from '../../game-engine/utilities/vector2'
 import { hasAZombie } from '../../utilities/zombies'
-import AudioPlayer from '../../classes/nodes/audio-player'
+import AudioPlayer from '../../game-engine/nodes/audio-player'
 import Zombie from '../zombies/_zombie'
 import { PLANTS } from '../../utilities/enums/plants'
 import Plant from './plant'
-import Time from '../../utilities/importants/time'
+import Time from '../../game-engine/utilities/time'
 import { PEA_DAMAGE, PEA_VELOCITY } from './peashooter'
+import SpriteTexture from '../../game-engine/utilities/sprite'
+import { SHOOT_VELOCITY } from '../projectils/pea'
 
 const sprites = [
   '/sprites/plants/snow-pea/idle3.png',
@@ -32,15 +34,14 @@ export default class SnowPea extends Plant {
   )
   #animation = new AnimatedSprite(
     this.transform,
-    new Vector2(16, 16),
     [
-      '/sprites/plants/snow-pea/idle1.png',
-      '/sprites/plants/snow-pea/idle2.png',
-      '/sprites/plants/snow-pea/idle1.png',
-      '/sprites/plants/snow-pea/idle3.png',
+      new SpriteTexture('/sprites/plants/snow-pea/idle1.png'),
+      new SpriteTexture('/sprites/plants/snow-pea/idle2.png'),
+      new SpriteTexture('/sprites/plants/snow-pea/idle1.png'),
+      new SpriteTexture('/sprites/plants/snow-pea/idle3.png'),
       // '/sprites/plants/snow-pea/attack.png',
     ],
-    4
+    4 / SHOOT_VELOCITY
   )
 
   nodes = [this.#animation]
@@ -92,12 +93,9 @@ class SnowPeaProjectil extends GameObject {
   )
 
   nodes = [
-    new Sprite(
-      '/sprites/projectiles/snow-pea.png',
-      this.transform,
-      new Vector2(4, 4),
-      { rawCoords: true }
-    ),
+    new Sprite('/sprites/projectiles/snow-pea.png', this.transform, {
+      rawCoords: true,
+    }),
   ]
 
   constructor(pos: Vector2) {

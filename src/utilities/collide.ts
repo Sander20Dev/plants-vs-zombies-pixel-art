@@ -1,6 +1,6 @@
-import { GameObject } from '../classes/game-object'
-import Vector2 from '../classes/vector2'
-import { Views } from '../loader'
+import { GameObject } from '../game-engine/game-object'
+import Vector2 from '../game-engine/utilities/vector2'
+import { Views } from '../game-engine/lib/loader'
 import { GameObjectTypes } from './enums'
 
 export function getCollide(

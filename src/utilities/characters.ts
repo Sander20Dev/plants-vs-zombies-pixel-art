@@ -1,6 +1,6 @@
-import { ctx } from '../classes/game-object'
-import Vector2 from '../classes/vector2'
-import { getImage } from './media-storage'
+import { ctx } from '../game-engine/game-object'
+import Vector2 from '../game-engine/utilities/vector2'
+import { getImage } from '../game-engine/utilities/media-manager/media-storage'
 
 const charsImg = getImage('/sprites/ui/characters.png')
 

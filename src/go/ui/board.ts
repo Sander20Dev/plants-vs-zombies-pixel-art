@@ -1,15 +1,15 @@
-import { GameObject, canvas } from '../../classes/game-object'
-import AudioPlayer from '../../classes/nodes/audio-player'
-import Clickable from '../../classes/nodes/clickable'
-import Collision from '../../classes/nodes/collider'
-import type NodeAbs from '../../classes/nodes/node'
-import Sprite from '../../classes/nodes/sprite'
-import Vector2 from '../../classes/vector2'
-import { Views } from '../../loader'
+import { GameObject, canvas } from '../../game-engine/game-object'
+import AudioPlayer from '../../game-engine/nodes/audio-player'
+import Clickable from '../../game-engine/nodes/clickable'
+import Collision from '../../game-engine/nodes/collider'
+import type NodeAbs from '../../game-engine/nodes/node'
+import Sprite from '../../game-engine/nodes/sprite'
+import Vector2 from '../../game-engine/utilities/vector2'
+import { Views } from '../../game-engine/lib/loader'
 import { scenes } from '../../manager/scenes-manager'
 import NewPlantScene from '../../scenes/adventure-mode/new-plant'
 import { selectedPlant, suns } from '../../states'
-import { pauseGame } from '../../update'
+import { pauseGame } from '../../game-engine/lib/update'
 import { GameObjectTypes } from '../../utilities/enums'
 import {
   PLANTS,
@@ -17,10 +17,11 @@ import {
   plantsClasses,
   plantsInfo,
 } from '../../utilities/enums/plants'
-import Time from '../../utilities/importants/time'
+import Time from '../../game-engine/utilities/time'
 import { getRandomValue } from '../../utilities/random'
 import LawnMower from '../accesiories/lawn-mower'
 import { images } from './seeds'
+import { Theme } from '../../utilities/enums/theme'
 
 export default class Board extends GameObject {
   endGame = false
@@ -51,23 +52,24 @@ export default class Board extends GameObject {
   ]
   lawnMowers: (LawnMower | null)[]
 
-  constructor(public rows = 5, public winnedPlant?: PLANTS) {
+  constructor(public theme = Theme.DAY) {
     super(GameObjectTypes.BACKGROUND, new Vector2(40, 24))
 
     this.nodes.push(
       new Sprite(
-        `/sprites/ui/maps/day/bg${rows !== 5 ? '-' + rows : ''}.png`,
-        Vector2.ZERO,
-        new Vector2(canvas.width, canvas.height)
+        '/sprites/ui/maps/' +
+          (theme === Theme.DAY ? 'day' : 'night') +
+          '/bg.png',
+        new Vector2(0, 0)
       )
     )
 
     this.lawnMowers = [
-      rows > 4 ? new LawnMower(new Vector2(24, 24)) : null,
-      rows > 2 ? new LawnMower(new Vector2(24, 40)) : null,
-      rows > 0 ? new LawnMower(new Vector2(24, 56)) : null,
-      rows > 2 ? new LawnMower(new Vector2(24, 72)) : null,
-      rows > 4 ? new LawnMower(new Vector2(24, 88)) : null,
+      new LawnMower(new Vector2(24, 24)),
+      new LawnMower(new Vector2(24, 40)),
+      new LawnMower(new Vector2(24, 56)),
+      new LawnMower(new Vector2(24, 72)),
+      new LawnMower(new Vector2(24, 88)),
     ]
 
     for (let i = 0; i < this.lawnMowers.length; i++) {
@@ -91,7 +93,6 @@ export default class Board extends GameObject {
 
   #onClick(mousePos: Vector2) {
     if (selectedPlant.current == null) return
-    const margin = Math.floor((5 - this.rows) / 2)
 
     const rx = mousePos.x - this.transform.x
     const ry = mousePos.y - this.transform.y
@@ -100,9 +101,9 @@ export default class Board extends GameObject {
     const y = Math.floor(ry / 16)
 
     if (y < 0 || x < 0) return
-    if (y < margin) return
+    if (y < 0) return
     if (y >= 5 || x >= 9) return
-    if (y >= margin + this.rows) return
+    if (y >= 5) return
 
     if (this.#board[y][x] != null) return
 
@@ -137,7 +138,7 @@ export default class Board extends GameObject {
   }
 
   onWin() {
-    if (this.winnedPlant) new NewPlant(this.winnedPlant)
+    // TODO: Add win sound
   }
 
   update() {
@@ -160,7 +161,7 @@ class NewPlant extends GameObject {
     )
 
     const img = images.find(({ plant: p }) => p === plant)!
-    const sprite = new Sprite(img.img, this.transform, new Vector2(16, 16), {
+    const sprite = new Sprite(img.img, this.transform, {
       rawCoords: true,
     })
     this.nodes = [sprite]

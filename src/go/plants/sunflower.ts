@@ -1,10 +1,17 @@
-import AnimatedSprite from '../../classes/nodes/animated-sprite'
-import Collision from '../../classes/nodes/collider'
-import Sun from '../../classes/sun'
-import Vector2 from '../../classes/vector2'
+import AnimatedSprite from '../../game-engine/nodes/animated-sprite'
+import Collision from '../../game-engine/nodes/collider'
+import Sun from '../../_mods-ge/sun'
+import Vector2 from '../../game-engine/utilities/vector2'
 import { PLANTS } from '../../utilities/enums/plants'
-import Time from '../../utilities/importants/time'
+import Time from '../../game-engine/utilities/time'
 import Plant from './plant'
+import { importSpriteSheet } from '../../game-engine/utilities/sprite'
+
+const [i2, i1, i3] = importSpriteSheet(
+  '/sprites/plants/sunflower/idle.png',
+  new Vector2(16),
+  3
+)
 
 const SUN_TIME = 48
 
@@ -15,17 +22,7 @@ export default class Sunflower extends Plant {
     new Vector2(5, 10)
   )
 
-  #animation = new AnimatedSprite(
-    this.transform,
-    new Vector2(16, 16),
-    [
-      '/sprites/plants/sunflower/idle1.png',
-      '/sprites/plants/sunflower/idle2.png',
-      '/sprites/plants/sunflower/idle1.png',
-      '/sprites/plants/sunflower/idle3.png',
-    ],
-    2
-  )
+  #animation = new AnimatedSprite(this.transform, [i1, i2, i1, i3], 2)
 
   nodes = [this.#animation]
 
@@ -57,9 +54,9 @@ export default class Sunflower extends Plant {
   }
 }
 
-class SunOfPlant extends Sun {
-  constructor(pos: Vector2) {
-    super(pos)
+export class SunOfPlant extends Sun {
+  constructor(pos: Vector2, price?: number) {
+    super(pos, price)
   }
 
   #max = Math.floor(Math.random() * 0.2) + 0.9

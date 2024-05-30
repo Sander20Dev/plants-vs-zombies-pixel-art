@@ -1,44 +1,46 @@
-import AnimatedSpritesList from '../../classes/nodes/animated-sprites-list'
-import Vector2 from '../../classes/vector2'
+import AnimatedSpritesList from '../../game-engine/nodes/animated-sprites-list'
+import { importSpriteSheet } from '../../game-engine/utilities/sprite'
+import Vector2 from '../../game-engine/utilities/vector2'
 import { zombieAnimation } from './_zombie'
 import Zombie from './_zombie'
 import AnimationObject from './animations/_animation'
 
+const [e1, e2, e3] = importSpriteSheet(
+  '/sprites/zombies/conehead-zombie/eat.png',
+  new Vector2(16),
+  3
+)
+const [em1, em2, em3] = importSpriteSheet(
+  '/sprites/zombies/conehead-zombie/eat-middle.png',
+  new Vector2(16),
+  3
+)
+const [w1, w2, w3] = importSpriteSheet(
+  '/sprites/zombies/conehead-zombie/walking.png',
+  new Vector2(16),
+  3
+)
+const [wm1, wm2, wm3] = importSpriteSheet(
+  '/sprites/zombies/conehead-zombie/walking-middle.png',
+  new Vector2(16),
+  3
+)
+
 const coneheadZombieAnimation = {
   'c-full-eat': {
-    srcs: [
-      '/sprites/zombies/conehead-zombie/eat-1.png',
-      '/sprites/zombies/conehead-zombie/eat-2.png',
-      '/sprites/zombies/conehead-zombie/eat-1.png',
-      '/sprites/zombies/conehead-zombie/eat-3.png',
-    ],
+    sprites: [e1, e2, e1, e3],
     fps: 4,
   },
   'c-full': {
-    srcs: [
-      '/sprites/zombies/conehead-zombie/walking-1.png',
-      '/sprites/zombies/conehead-zombie/walking-2.png',
-      '/sprites/zombies/conehead-zombie/walking-3.png',
-      '/sprites/zombies/conehead-zombie/walking-2.png',
-    ],
+    sprites: [w1, w2, w3, w2],
     fps: 5,
   },
   'c-middle-eat': {
-    srcs: [
-      '/sprites/zombies/conehead-zombie/eat-middle-1.png',
-      '/sprites/zombies/conehead-zombie/eat-middle-2.png',
-      '/sprites/zombies/conehead-zombie/eat-middle-1.png',
-      '/sprites/zombies/conehead-zombie/eat-middle-3.png',
-    ],
+    sprites: [em1, em2, em1, em3],
     fps: 4,
   },
   'c-middle': {
-    srcs: [
-      '/sprites/zombies/conehead-zombie/walking-middle-1.png',
-      '/sprites/zombies/conehead-zombie/walking-middle-2.png',
-      '/sprites/zombies/conehead-zombie/walking-middle-3.png',
-      '/sprites/zombies/conehead-zombie/walking-middle-2.png',
-    ],
+    sprites: [wm1, wm2, wm3, wm2],
     fps: 5,
   },
   ...zombieAnimation,
@@ -47,7 +49,6 @@ const coneheadZombieAnimation = {
 export default class ConeheadZombie extends Zombie {
   animationList = new AnimatedSpritesList(
     this.transform,
-    new Vector2(16, 16),
     coneheadZombieAnimation,
     'c-full'
   )
@@ -83,19 +84,12 @@ class ConeBreaked extends AnimationObject {
   constructor(pos: Vector2) {
     super(
       pos,
-      [
-        '/sprites/zombies/conehead-zombie/cone-breaked-1.png',
-        '/sprites/zombies/conehead-zombie/cone-breaked-2.png',
-        '/sprites/zombies/conehead-zombie/cone-breaked-3.png',
-        '/sprites/zombies/conehead-zombie/cone-breaked-4.png',
-        '/sprites/zombies/conehead-zombie/cone-breaked-5.png',
-        '/sprites/zombies/conehead-zombie/cone-breaked-6.png',
-        '/sprites/zombies/conehead-zombie/cone-breaked-7.png',
-        '/sprites/zombies/conehead-zombie/cone-breaked-8.png',
-        '/sprites/zombies/conehead-zombie/cone-breaked-9.png',
-      ],
-      6,
-      Vector2.ZERO,
+      importSpriteSheet(
+        '/sprites/zombies/conehead-zombie/cone-breaked.png',
+        new Vector2(16),
+        10
+      ),
+      10,
       { loop: false }
     )
   }

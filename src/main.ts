@@ -1,4 +1,4 @@
 import './style.css'
-import './go'
-import initGame from './update'
+import './scenes'
+import initGame from './game-engine/lib/update'
 initGame()

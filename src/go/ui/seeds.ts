@@ -1,7 +1,7 @@
-import { GameObject, ctx } from '../../classes/game-object'
-import AudioPlayer from '../../classes/nodes/audio-player'
-import Clickable from '../../classes/nodes/clickable'
-import Vector2 from '../../classes/vector2'
+import { GameObject, ctx } from '../../game-engine/game-object'
+import AudioPlayer from '../../game-engine/nodes/audio-player'
+import Clickable from '../../game-engine/nodes/clickable'
+import Vector2 from '../../game-engine/utilities/vector2'
 import { selectedPlant, suns } from '../../states'
 import { GameObjectTypes } from '../../utilities/enums'
 import {
@@ -10,8 +10,8 @@ import {
   loadingSeeds,
   plantsInfo,
 } from '../../utilities/enums/plants'
-import Time from '../../utilities/importants/time'
-import { getImage } from '../../utilities/media-storage'
+import Time from '../../game-engine/utilities/time'
+import { getImage } from '../../game-engine/utilities/media-manager/media-storage'
 
 export const images = allPlants.map((plant) => {
   return { img: getImage('/sprites/ui/seeds/' + plant + '.png', 24, 16), plant }

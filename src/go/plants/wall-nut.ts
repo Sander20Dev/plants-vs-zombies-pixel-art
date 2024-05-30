@@ -1,28 +1,35 @@
-import AnimatedSpritesList from '../../classes/nodes/animated-sprites-list'
-import Collision from '../../classes/nodes/collider'
-import Vector2 from '../../classes/vector2'
+import AnimatedSpritesList from '../../game-engine/nodes/animated-sprites-list'
+import Collision from '../../game-engine/nodes/collider'
+import SpriteTexture from '../../game-engine/utilities/sprite'
+import Vector2 from '../../game-engine/utilities/vector2'
 import { PLANTS } from '../../utilities/enums/plants'
 import Plant from './plant'
 
 const wallNutAnimation = {
   '1': {
-    srcs: [
-      ...Array<string>(9).fill('/sprites/plants/wall-nut/1-idle1.png'),
-      '/sprites/plants/wall-nut/1-idle2.png',
+    sprites: [
+      ...Array(9).fill(
+        new SpriteTexture('/sprites/plants/wall-nut/1-idle1.png')
+      ),
+      new SpriteTexture('/sprites/plants/wall-nut/1-idle2.png'),
     ],
     fps: 5,
   },
   '2': {
-    srcs: [
-      ...Array<string>(9).fill('/sprites/plants/wall-nut/2-idle1.png'),
-      '/sprites/plants/wall-nut/2-idle2.png',
+    sprites: [
+      ...Array(9).fill(
+        new SpriteTexture('/sprites/plants/wall-nut/2-idle1.png')
+      ),
+      new SpriteTexture('/sprites/plants/wall-nut/2-idle2.png'),
     ],
     fps: 5,
   },
   '3': {
-    srcs: [
-      ...Array<string>(9).fill('/sprites/plants/wall-nut/3-idle1.png'),
-      '/sprites/plants/wall-nut/3-idle2.png',
+    sprites: [
+      ...Array(9).fill(
+        new SpriteTexture('/sprites/plants/wall-nut/3-idle1.png')
+      ),
+      new SpriteTexture('/sprites/plants/wall-nut/3-idle2.png'),
     ],
     fps: 5,
   },
@@ -37,7 +44,6 @@ export default class WallNut extends Plant {
 
   #animationList = new AnimatedSpritesList(
     this.transform,
-    new Vector2(16, 16),
     wallNutAnimation,
     '1'
   )

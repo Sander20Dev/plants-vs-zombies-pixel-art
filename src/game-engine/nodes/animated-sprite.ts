@@ -1,0 +1,108 @@
+import Time from '../utilities/time'
+import { ctx } from '../game-object'
+import Vector2 from '../utilities/vector2'
+import NodeAbs from './node'
+import SpriteTexture from '../utilities/sprite'
+
+export default class AnimatedSprite extends NodeAbs {
+  #animations
+  #fps
+  options
+
+  constructor(
+    public transform: Vector2,
+    animationSrcs: SpriteTexture[],
+    fps: number,
+    { loop = true } = {}
+  ) {
+    super()
+
+    if (loop) {
+      this.played = true
+    }
+    this.options = { loop }
+
+    this.#animations = animationSrcs
+
+    this.#fps = 1 / fps
+    this.onChange(0)
+  }
+
+  ignore = false
+
+  currentAnimation = 0
+  #counter = 0
+
+  play() {
+    this.played = true
+    this.onChange(0)
+  }
+
+  played = false
+
+  onEnd() {}
+
+  changeFPS(fps: number) {
+    this.#fps = 1 / fps
+  }
+  changeAnAnimation(index: number, src: string | SpriteTexture) {
+    if (src instanceof SpriteTexture) {
+      if (src.img.src === this.#animations[index].img.src) return
+
+      this.#animations[index] = src
+    } else {
+      if (src === this.#animations[index].img.src) return
+
+      this.#animations[index] = new SpriteTexture(src)
+    }
+  }
+  setAnimationIndex(index: number) {
+    this.currentAnimation = index
+  }
+
+  onChange(currentAnimationIndex: number): void
+  onChange() {}
+
+  draw(filter?: string): void {
+    if (filter) ctx.filter = filter
+
+    this.#animations[this.currentAnimation].draw(
+      this.transform.roundedX,
+      this.transform.roundedY
+    )
+    if (filter) ctx.filter = 'none'
+  }
+
+  update() {
+    if (this.#animations.length < 1) return
+
+    let end = false
+
+    if (this.played) {
+      this.#counter += Time.deltaTime
+
+      if (this.#counter > this.#fps) {
+        this.currentAnimation++
+        this.#counter -= this.#fps
+
+        if (!this.options.loop) {
+          if (this.currentAnimation >= this.#animations.length && this.played) {
+            this.currentAnimation = 0
+          } else if (this.currentAnimation + 1 >= this.#animations.length) {
+            this.currentAnimation = this.currentAnimation
+            this.played = false
+            end = true
+          }
+        } else {
+          if (this.currentAnimation >= this.#animations.length) {
+            this.currentAnimation = 0
+          }
+        }
+
+        this.onChange(this.currentAnimation)
+      }
+    }
+
+    if (end) this.onEnd()
+  }
+}

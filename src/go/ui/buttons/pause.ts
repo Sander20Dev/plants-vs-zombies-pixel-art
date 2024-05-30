@@ -1,14 +1,15 @@
-import Button from '../../../classes/game-objects/button'
-import Vector2 from '../../../classes/vector2'
-import Input from '../../../utilities/importants/input'
+import Button from '../../../_mods-ge/button'
+import Vector2 from '../../../game-engine/utilities/vector2'
+import Input from '../../../game-engine/utilities/input'
 import PauseMenu from '../views/pause-menu'
+import SpriteTexture from '../../../game-engine/utilities/sprite'
 
 export default class Pause extends Button {
   pause?: PauseMenu
   constructor() {
     super(new Vector2(174, 4), new Vector2(14, 12), {
-      normal: '/sprites/ui/buttons/pause/normal.png',
-      active: '/sprites/ui/buttons/pause/active.png',
+      normal: new SpriteTexture('/sprites/ui/buttons/pause/normal.png'),
+      active: new SpriteTexture('/sprites/ui/buttons/pause/active.png'),
     })
     window.addEventListener('blur', this.blur)
   }

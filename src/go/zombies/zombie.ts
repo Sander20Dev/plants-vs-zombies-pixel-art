@@ -1,4 +1,4 @@
-import Vector2 from '../../classes/vector2'
+import Vector2 from '../../game-engine/utilities/vector2'
 import Zombie from './_zombie'
 
 export const ZOMBIE_SPEED = 4

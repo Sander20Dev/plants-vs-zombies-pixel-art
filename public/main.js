@@ -27,7 +27,7 @@ const json = {
 }
 
 fs.writeFile(
-  '../src/utilities/media/all-src.json',
+  '../src/game-engine/utilities/media-manager/media/all-src.json',
   JSON.stringify(json),
   (err) => {
     console.log(err ?? 'Success')

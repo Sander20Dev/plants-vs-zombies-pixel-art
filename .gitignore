@@ -26,3 +26,4 @@ dist-ssr
 # Some Actions
 public/main.js
 public/package.json
+**/**/sprite-sheet-maker.html

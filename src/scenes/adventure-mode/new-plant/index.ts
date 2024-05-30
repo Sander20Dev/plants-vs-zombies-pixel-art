@@ -1,7 +1,7 @@
-import { GameObject, ctx } from '../../../classes/game-object'
-import Clickable from '../../../classes/nodes/clickable'
-import Sprite from '../../../classes/nodes/sprite'
-import Vector2 from '../../../classes/vector2'
+import { GameObject, ctx } from '../../../game-engine/game-object'
+import Clickable from '../../../game-engine/nodes/clickable'
+import Sprite from '../../../game-engine/nodes/sprite'
+import Vector2 from '../../../game-engine/utilities/vector2'
 import { images } from '../../../go/ui/seeds'
 import { scenes } from '../../../manager/scenes-manager'
 import { GameObjectTypes } from '../../../utilities/enums'
@@ -21,11 +21,7 @@ class Bg extends GameObject {
   constructor(plant: PLANTS) {
     super(GameObjectTypes.BACKGROUND, Vector2.ZERO)
     this.nodes = [
-      new Sprite(
-        '/sprites/ui/views/new-plant.png',
-        this.transform,
-        Vector2.ZERO
-      ),
+      new Sprite('/sprites/ui/views/new-plant.png', this.transform),
       new Clickable(new Vector2(50, 96), new Vector2(88, 14), () =>
         scenes.changeScene(Lobby)
       ),

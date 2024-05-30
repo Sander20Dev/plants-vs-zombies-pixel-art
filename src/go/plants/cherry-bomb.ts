@@ -1,5 +1,6 @@
-import AnimatedSprite from '../../classes/nodes/animated-sprite'
-import Vector2 from '../../classes/vector2'
+import AnimatedSprite from '../../game-engine/nodes/animated-sprite'
+import { importSpriteSheet } from '../../game-engine/utilities/sprite'
+import Vector2 from '../../game-engine/utilities/vector2'
 import { getCollide } from '../../utilities/collide'
 import { GameObjectTypes } from '../../utilities/enums'
 import { PLANTS } from '../../utilities/enums/plants'
@@ -10,15 +11,11 @@ import Plant from './plant'
 export default class CherryBomb extends Plant {
   animation = new AnimatedSprite(
     this.transform,
-    new Vector2(16, 16),
-    [
-      '/sprites/plants/cherry-bomb/explotion-1.png',
-      '/sprites/plants/cherry-bomb/explotion-2.png',
-      '/sprites/plants/cherry-bomb/explotion-3.png',
-      '/sprites/plants/cherry-bomb/explotion-4.png',
-      '/sprites/plants/cherry-bomb/explotion-5.png',
-      '/sprites/plants/cherry-bomb/explotion-6.png',
-    ],
+    importSpriteSheet(
+      '/sprites/plants/cherry-bomb/explotion.png',
+      new Vector2(16),
+      6
+    ),
     5,
     { loop: false }
   )
@@ -51,20 +48,12 @@ class Booomb extends AnimationObject {
   constructor(pos: Vector2) {
     super(
       pos,
-      [
-        '/sprites/plants/cherry-bomb/boomb-1.png',
-        '/sprites/plants/cherry-bomb/boomb-2.png',
-        '/sprites/plants/cherry-bomb/boomb-3.png',
-        '/sprites/plants/cherry-bomb/boomb-4.png',
-        '/sprites/plants/cherry-bomb/boomb-5.png',
-        '/sprites/plants/cherry-bomb/boomb-6.png',
-        '/sprites/plants/cherry-bomb/boomb-7.png',
-        '/sprites/plants/cherry-bomb/boomb-8.png',
-        '/sprites/plants/cherry-bomb/boomb-9.png',
-        '/sprites/plants/cherry-bomb/boomb-10.png',
-      ],
+      importSpriteSheet(
+        '/sprites/plants/cherry-bomb/boomb.png',
+        new Vector2(48),
+        10
+      ),
       10,
-      new Vector2(48, 48),
       { loop: false }
     )
   }

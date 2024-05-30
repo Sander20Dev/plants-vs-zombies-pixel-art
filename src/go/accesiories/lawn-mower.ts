@@ -1,11 +1,11 @@
-import { GameObject, canvas } from '../../classes/game-object'
-import Entity from '../../classes/game-object/entity'
-import AudioPlayer from '../../classes/nodes/audio-player'
-import Collision from '../../classes/nodes/collider'
-import Sprite from '../../classes/nodes/sprite'
-import Vector2 from '../../classes/vector2'
+import { GameObject, canvas } from '../../game-engine/game-object'
+import Entity from '../../_mods-ge/entity'
+import AudioPlayer from '../../game-engine/nodes/audio-player'
+import Collision from '../../game-engine/nodes/collider'
+import Sprite from '../../game-engine/nodes/sprite'
+import Vector2 from '../../game-engine/utilities/vector2'
 import { GameObjectTypes } from '../../utilities/enums'
-import Time from '../../utilities/importants/time'
+import Time from '../../game-engine/utilities/time'
 
 export default class LawnMower extends GameObject {
   collision: Collision = new Collision(
@@ -29,12 +29,9 @@ export default class LawnMower extends GameObject {
   }
 
   nodes = [
-    new Sprite(
-      '/sprites/ui/lawn-mower.png',
-      this.transform,
-      new Vector2(16, 16),
-      { rawCoords: true }
-    ),
+    new Sprite('/sprites/ui/lawn-mower.png', this.transform, {
+      rawCoords: true,
+    }),
   ]
 
   constructor(pos: Vector2) {

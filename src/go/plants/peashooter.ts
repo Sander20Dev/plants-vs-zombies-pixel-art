@@ -1,15 +1,13 @@
-import { GameObject, canvas } from '../../classes/game-object'
-import { GameObjectTypes } from '../../utilities/enums'
-import Entity from '../../classes/game-object/entity'
-import AnimatedSprite from '../../classes/nodes/animated-sprite'
-import Collision from '../../classes/nodes/collider'
-import Sprite from '../../classes/nodes/sprite'
-import Vector2 from '../../classes/vector2'
+import { canvas } from '../../game-engine/game-object'
+import AnimatedSprite from '../../game-engine/nodes/animated-sprite'
+import Collision from '../../game-engine/nodes/collider'
+import Vector2 from '../../game-engine/utilities/vector2'
 import { hasAZombie } from '../../utilities/zombies'
-import AudioPlayer from '../../classes/nodes/audio-player'
+import AudioPlayer from '../../game-engine/nodes/audio-player'
 import Plant from './plant'
 import { PLANTS } from '../../utilities/enums/plants'
-import Time from '../../utilities/importants/time'
+import SpriteTexture from '../../game-engine/utilities/sprite'
+import Pea, { SHOOT_VELOCITY } from '../projectils/pea'
 
 const sprites = [
   '/sprites/plants/peashooter/idle3.png',
@@ -31,15 +29,14 @@ export default class Peashooter extends Plant {
   )
   #animation = new AnimatedSprite(
     this.transform,
-    new Vector2(16, 16),
     [
-      '/sprites/plants/peashooter/idle1.png',
-      '/sprites/plants/peashooter/idle2.png',
-      '/sprites/plants/peashooter/idle1.png',
-      '/sprites/plants/peashooter/idle3.png',
+      new SpriteTexture('/sprites/plants/peashooter/idle1.png'),
+      new SpriteTexture('/sprites/plants/peashooter/idle2.png'),
+      new SpriteTexture('/sprites/plants/peashooter/idle1.png'),
+      new SpriteTexture('/sprites/plants/peashooter/idle3.png'),
       // '/sprites/plants/peashooter/attack.png',
     ],
-    4
+    4 / SHOOT_VELOCITY
   )
 
   nodes = [this.#animation]
@@ -60,7 +57,7 @@ export default class Peashooter extends Plant {
     } else {
       this.#audiosList.throw2.play()
     }
-    new PeaProjectil(new Vector2(this.transform.x + 10, this.transform.y + 8))
+    new Pea(new Vector2(this.transform.x + 10, this.transform.y + 8))
   }
 
   update(): void {
@@ -76,54 +73,3 @@ export default class Peashooter extends Plant {
 
 export const PEA_VELOCITY = 100
 export const PEA_DAMAGE = 20
-
-class PeaProjectil extends GameObject {
-  #audioList = {
-    splat: new AudioPlayer('/audios/plants/pea/splat.ogg'),
-    splat2: new AudioPlayer('/audios/plants/pea/splat2.ogg'),
-    splat3: new AudioPlayer('/audios/plants/pea/splat3.ogg'),
-  }
-
-  collision: Collision = new Collision(
-    this,
-    Vector2.ZERO,
-    new Vector2(4, 4),
-    GameObjectTypes.ZOMBIE
-  )
-
-  nodes = [
-    new Sprite(
-      '/sprites/projectiles/pea.png',
-      this.transform,
-      new Vector2(4, 4),
-      { rawCoords: true }
-    ),
-  ]
-
-  constructor(pos: Vector2) {
-    super(GameObjectTypes.PROJECTIL, pos)
-
-    this.collision.onCollision = (zombie) => {
-      if (zombie instanceof Entity) {
-        const random = Math.random()
-
-        if (random < 0.33) {
-          this.#audioList.splat.play()
-        } else if (random < 0.67) {
-          this.#audioList.splat2.play()
-        } else {
-          this.#audioList.splat3.play()
-        }
-
-        zombie.attack(PEA_DAMAGE)
-        this.destroy()
-      }
-    }
-  }
-
-  update(): void {
-    this.transform.x += Time.deltaTime * PEA_VELOCITY
-
-    if (this.transform.x >= canvas.width) this.destroy()
-  }
-}

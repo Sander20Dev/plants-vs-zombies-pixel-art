@@ -1,5 +1,5 @@
-import Entity from '../../classes/game-object/entity'
-import Vector2 from '../../classes/vector2'
+import Entity from '../../_mods-ge/entity'
+import Vector2 from '../../game-engine/utilities/vector2'
 import { GameObjectTypes } from '../../utilities/enums'
 import { PLANTS, plantsInfo } from '../../utilities/enums/plants'
 

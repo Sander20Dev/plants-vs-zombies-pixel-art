@@ -1,54 +1,55 @@
-import Entity from '../../classes/game-object/entity'
-import AnimatedSpritesList from '../../classes/nodes/animated-sprites-list'
-import AudioPlayer from '../../classes/nodes/audio-player'
-import Collision from '../../classes/nodes/collider'
-import Vector2 from '../../classes/vector2'
+import Entity from '../../_mods-ge/entity'
+import AnimatedSpritesList from '../../game-engine/nodes/animated-sprites-list'
+import AudioPlayer from '../../game-engine/nodes/audio-player'
+import Collision from '../../game-engine/nodes/collider'
+import Vector2 from '../../game-engine/utilities/vector2'
 import { GameObjectTypes } from '../../utilities/enums'
-import Time from '../../utilities/importants/time'
+import Time from '../../game-engine/utilities/time'
 import Plant from '../plants/plant'
 import Headless, { Fired } from './animations/headless'
 import ZombieArm from './animations/zombie-arm'
+import { importSpriteSheet } from '../../game-engine/utilities/sprite'
+
+const [eat1, eat2, eat3] = importSpriteSheet(
+  '/sprites/zombies/zombie/eat.png',
+  new Vector2(16),
+  3
+)
+const [walking1, walking2, walking3] = importSpriteSheet(
+  '/sprites/zombies/zombie/walking.png',
+  new Vector2(16),
+  3
+)
+const [walkingMiddle1, walkingMiddle2, walkingMiddle3] = importSpriteSheet(
+  '/sprites/zombies/zombie/walking-middle.png',
+  new Vector2(16),
+  3
+)
 
 export const zombieAnimation = {
   'z-normal-eat': {
-    srcs: [
-      '/sprites/zombies/zombie/eat-1.png',
-      '/sprites/zombies/zombie/eat-2.png',
-      '/sprites/zombies/zombie/eat-1.png',
-      '/sprites/zombies/zombie/eat-3.png',
-    ],
+    sprites: [eat1, eat2, eat1, eat3],
     fps: 4,
   },
   'z-normal': {
-    srcs: [
-      '/sprites/zombies/zombie/walking-1.png',
-      '/sprites/zombies/zombie/walking-2.png',
-      '/sprites/zombies/zombie/walking-3.png',
-      '/sprites/zombies/zombie/walking-2.png',
-    ],
+    sprites: [walking1, walking2, walking3, walking2],
     fps: 5,
   },
   'z-arm-eat': {
-    srcs: [
-      '/sprites/zombies/zombie/eat-middle-1.png',
-      '/sprites/zombies/zombie/eat-middle-2.png',
-      '/sprites/zombies/zombie/eat-middle-1.png',
-      '/sprites/zombies/zombie/eat-middle-2.png',
-    ],
-    fps: 4,
+    sprites: importSpriteSheet(
+      '/sprites/zombies/zombie/eat-middle.png',
+      new Vector2(16),
+      2
+    ),
+    fps: 8,
   },
   'z-arm': {
-    srcs: [
-      '/sprites/zombies/zombie/walking-middle-1.png',
-      '/sprites/zombies/zombie/walking-middle-2.png',
-      '/sprites/zombies/zombie/walking-middle-3.png',
-      '/sprites/zombies/zombie/walking-middle-2.png',
-    ],
+    sprites: [walkingMiddle1, walkingMiddle2, walkingMiddle3, walkingMiddle2],
     fps: 5,
   },
 }
 
-export const ZOMBIE_SPEED = 4
+export const ZOMBIE_SPEED = 3.5
 
 export default class Zombie extends Entity {
   noEat = false
@@ -75,14 +76,6 @@ export default class Zombie extends Entity {
         this.animationList.setCurrentAnimation(this.currentAnimation, true)
         this.transform.x -= ZOMBIE_SPEED * Time.deltaTime
       }
-
-      // if (plant === this.plantToEat) return
-      // if (plant != null) {
-      //   if (!(plant instanceof Plant)) return
-      //   this.plantToEat = plant
-      // } else {
-      //   this.plantToEat = null
-      // }
     }
     this.init()
   }
@@ -116,7 +109,6 @@ export default class Zombie extends Entity {
 
   animationList = new AnimatedSpritesList(
     this.transform,
-    new Vector2(16, 16),
     zombieAnimation,
     'z-normal'
   )
@@ -172,11 +164,6 @@ export default class Zombie extends Entity {
   }
 
   eatPlant(plant: Plant) {
-    // if (this.plantToEat == null) {
-    //   this.transform.x -= ZOMBIE_SPEED * Time.deltaTime
-    // } else {
-    console.log(this.currentAnimation)
-
     this.animationList.animations[this.currentAnimation + '-eat'].onChange = (
       i
     ) => {
@@ -189,17 +176,6 @@ export default class Zombie extends Entity {
       plant.attack(50)
     }
     this.animationList.setCurrentAnimation(this.currentAnimation + '-eat', true)
-    // this.#eatCounter += Time.deltaTime
-    // if (this.#eatCounter >= 1) {
-    //   this.#eatCounter -= 1
-    //   if (Math.random() < 0.5) {
-    //     this.#audioList.chomp.play()
-    //   } else {
-    //     this.#audioList.chomp2.play()
-    //   }
-    //   this.plantToEat.attack(100)
-    // }
-    // }
   }
 
   onUpdate() {

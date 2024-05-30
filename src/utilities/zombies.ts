@@ -1,6 +1,6 @@
-import Entity from '../classes/game-object/entity'
-import Vector2 from '../classes/vector2'
-import { Views } from '../loader'
+import Entity from '../_mods-ge/entity'
+import Vector2 from '../game-engine/utilities/vector2'
+import { Views } from '../game-engine/lib/loader'
 import { GameObjectTypes } from './enums'
 
 export function hasAZombie(x: number, y: number, dx: number, dy: number) {

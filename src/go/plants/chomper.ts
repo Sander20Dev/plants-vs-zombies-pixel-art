@@ -1,6 +1,7 @@
-import AnimatedSpritesList from '../../classes/nodes/animated-sprites-list'
-import Collision from '../../classes/nodes/collider'
-import Vector2 from '../../classes/vector2'
+import AnimatedSpritesList from '../../game-engine/nodes/animated-sprites-list'
+import Collision from '../../game-engine/nodes/collider'
+import { importSpriteSheet } from '../../game-engine/utilities/sprite'
+import Vector2 from '../../game-engine/utilities/vector2'
 import { getCollide } from '../../utilities/collide'
 import { Counter } from '../../utilities/delta'
 import { GameObjectTypes } from '../../utilities/enums'
@@ -20,66 +21,50 @@ const collidePerIndex = [
   { rel: new Vector2(23, 2), size: new Vector2(7, 9) },
 ]
 
+const [idle1, idle2, idle3] = importSpriteSheet(
+  '/sprites/plants/chomper/idle.png',
+  new Vector2(16),
+  3
+)
+const [idleEat1, idleEat2, idleEat3] = importSpriteSheet(
+  '/sprites/plants/chomper/idle-eat.png',
+  new Vector2(16),
+  3
+)
+
 const chomperAnimation = {
   idle: {
-    srcs: [
-      '/sprites/plants/chomper/idle-1.png',
-      '/sprites/plants/chomper/idle-2.png',
-      '/sprites/plants/chomper/idle-3.png',
-      '/sprites/plants/chomper/idle-2.png',
-    ],
+    sprites: [idle1, idle2, idle3, idle2],
     fps: 4,
   },
   'prepare-to-eat': {
-    srcs: [
-      '/sprites/plants/chomper/prepare-to-eat-1.png',
-      '/sprites/plants/chomper/prepare-to-eat-2.png',
-      '/sprites/plants/chomper/prepare-to-eat-3.png',
-      '/sprites/plants/chomper/prepare-to-eat-4.png',
-      '/sprites/plants/chomper/prepare-to-eat-5.png',
-      '/sprites/plants/chomper/prepare-to-eat-6.png',
-      '/sprites/plants/chomper/prepare-to-eat-7.png',
-      '/sprites/plants/chomper/prepare-to-eat-8.png',
-      '/sprites/plants/chomper/prepare-to-eat-9.png',
-    ],
+    sprites: importSpriteSheet(
+      '/sprites/plants/chomper/prepare-to-eat.png',
+      new Vector2(32, 16),
+      9
+    ),
     fps: 5,
     loop: false,
   },
   'init-eat': {
-    srcs: [
-      '/sprites/plants/chomper/init-eat-1.png',
-      '/sprites/plants/chomper/init-eat-2.png',
-      '/sprites/plants/chomper/init-eat-3.png',
-      '/sprites/plants/chomper/init-eat-4.png',
-      '/sprites/plants/chomper/init-eat-5.png',
-      '/sprites/plants/chomper/init-eat-6.png',
-      '/sprites/plants/chomper/init-eat-7.png',
-      '/sprites/plants/chomper/init-eat-8.png',
-      '/sprites/plants/chomper/init-eat-9.png',
-    ],
+    sprites: importSpriteSheet(
+      '/sprites/plants/chomper/init-eat.png',
+      new Vector2(32, 16),
+      9
+    ),
     fps: 5,
     loop: false,
   },
   'idle-eat': {
-    srcs: [
-      '/sprites/plants/chomper/idle-eat-1.png',
-      '/sprites/plants/chomper/idle-eat-2.png',
-      '/sprites/plants/chomper/idle-eat-3.png',
-      '/sprites/plants/chomper/idle-eat-2.png',
-    ],
+    sprites: [idleEat1, idleEat2, idleEat3, idleEat2],
     fps: 4,
   },
   recharge: {
-    srcs: [
-      '/sprites/plants/chomper/recharge-1.png',
-      '/sprites/plants/chomper/recharge-2.png',
-      '/sprites/plants/chomper/recharge-3.png',
-      '/sprites/plants/chomper/recharge-4.png',
-      '/sprites/plants/chomper/recharge-5.png',
-      '/sprites/plants/chomper/recharge-6.png',
-      '/sprites/plants/chomper/recharge-7.png',
-      '/sprites/plants/chomper/recharge-8.png',
-    ],
+    sprites: importSpriteSheet(
+      '/sprites/plants/chomper/recharge.png',
+      new Vector2(16),
+      8
+    ),
     fps: 4,
     loop: false,
   },
@@ -88,7 +73,6 @@ const chomperAnimation = {
 export default class Chomper extends Plant {
   animationList = new AnimatedSpritesList(
     this.transform,
-    new Vector2(16, 16),
     chomperAnimation,
     'idle'
   )

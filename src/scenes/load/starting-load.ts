@@ -1,7 +1,7 @@
 import { setUpUI, ui } from '../../library'
 import { scenes } from '../../manager/scenes-manager'
 import { State, UseStates } from '../../ui/lib'
-import { loadAllMedia } from '../../utilities/media/load'
+import { loadAllMedia } from '../../game-engine/utilities/media-manager/media/load'
 import Scene from '../_scene'
 import Lobby from '../lobby'
 

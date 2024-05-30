@@ -1,5 +1,5 @@
-import { canvas } from '../../../classes/game-object'
-import Vector2 from '../../../classes/vector2'
+import { canvas } from '../../../game-engine/game-object'
+import Vector2 from '../../../game-engine/utilities/vector2'
 import { scenes } from '../../../manager/scenes-manager'
 import { State, UseStates } from '../../../ui/lib'
 import Background from '../../../ui/utils/background'

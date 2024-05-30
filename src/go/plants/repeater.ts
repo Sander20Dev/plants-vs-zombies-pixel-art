@@ -1,16 +1,27 @@
-import { GameObject, canvas } from '../../classes/game-object'
+import { GameObject, canvas } from '../../game-engine/game-object'
 import { GameObjectTypes } from '../../utilities/enums'
-import Entity from '../../classes/game-object/entity'
-import Collision from '../../classes/nodes/collider'
-import Sprite from '../../classes/nodes/sprite'
-import Vector2 from '../../classes/vector2'
+import Entity from '../../_mods-ge/entity'
+import Collision from '../../game-engine/nodes/collider'
+import Sprite from '../../game-engine/nodes/sprite'
+import Vector2 from '../../game-engine/utilities/vector2'
 import { hasAZombie } from '../../utilities/zombies'
-import AudioPlayer from '../../classes/nodes/audio-player'
-import AnimatedSpritesList from '../../classes/nodes/animated-sprites-list'
+import AudioPlayer from '../../game-engine/nodes/audio-player'
+import AnimatedSpritesList from '../../game-engine/nodes/animated-sprites-list'
 import Plant from './plant'
 import { PLANTS } from '../../utilities/enums/plants'
-import Time from '../../utilities/importants/time'
+import Time from '../../game-engine/utilities/time'
 import { PEA_DAMAGE, PEA_VELOCITY } from './peashooter'
+import SpriteTexture, {
+  importSpriteSheet,
+} from '../../game-engine/utilities/sprite'
+import { SHOOT_VELOCITY } from '../projectils/pea'
+
+const [idle1, idle2, idle3] = importSpriteSheet(
+  '/sprites/plants/repeater/idle.png',
+  new Vector2(16),
+  3
+)
+const attack = new SpriteTexture('/sprites/plants/repeater/attack.png')
 
 export default class Repeater extends Plant {
   #attacking = false
@@ -27,25 +38,14 @@ export default class Repeater extends Plant {
   )
   #animationList = new AnimatedSpritesList(
     this.transform,
-    new Vector2(16, 16),
     {
       idle: {
-        srcs: [
-          '/sprites/plants/repeater/idle1.png',
-          '/sprites/plants/repeater/idle2.png',
-          '/sprites/plants/repeater/idle1.png',
-          '/sprites/plants/repeater/idle3.png',
-        ],
-        fps: 4,
+        sprites: [idle1, idle2, idle1, idle3],
+        fps: 4 / SHOOT_VELOCITY,
         loop: false,
       },
       attack: {
-        srcs: [
-          '/sprites/plants/repeater/attack.png',
-          '/sprites/plants/repeater/idle3.png',
-          '/sprites/plants/repeater/attack.png',
-          '/sprites/plants/repeater/idle3.png',
-        ],
+        sprites: [attack, idle3, attack, idle3],
         fps: 10,
         loop: false,
       },
@@ -122,12 +122,9 @@ class PeaProjectil extends GameObject {
   )
 
   nodes = [
-    new Sprite(
-      '/sprites/projectiles/pea.png',
-      this.transform,
-      new Vector2(4, 4),
-      { rawCoords: true }
-    ),
+    new Sprite('/sprites/projectiles/pea.png', this.transform, {
+      rawCoords: true,
+    }),
   ]
 
   constructor(pos: Vector2) {

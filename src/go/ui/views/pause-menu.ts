@@ -1,12 +1,12 @@
-import { GameObject, ctx } from '../../../classes/game-object'
-import Button from '../../../classes/game-objects/button'
-import Vector2 from '../../../classes/vector2'
+import { GameObject, ctx } from '../../../game-engine/game-object'
+import Button from '../../../_mods-ge/button'
+import Vector2 from '../../../game-engine/utilities/vector2'
 import { scenes } from '../../../manager/scenes-manager'
 import Lobby from '../../../scenes/lobby'
-import { pauseGame } from '../../../update'
+import { pauseGame } from '../../../game-engine/lib/update'
 import { GameObjectTypes } from '../../../utilities/enums'
-import Time from '../../../utilities/importants/time'
-import { getImage } from '../../../utilities/media-storage'
+import Time from '../../../game-engine/utilities/time'
+import { getImage } from '../../../game-engine/utilities/media-manager/media-storage'
 
 const pauseView = getImage('/sprites/ui/views/pause-menu/menu.png')
 

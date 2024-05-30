@@ -1,4 +1,4 @@
-import Time from './importants/time'
+import Time from '../game-engine/utilities/time'
 
 export class Counter {
   timer = 0

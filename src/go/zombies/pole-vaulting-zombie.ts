@@ -1,98 +1,93 @@
-import AnimatedSpritesList from '../../classes/nodes/animated-sprites-list'
-import Vector2 from '../../classes/vector2'
+import AnimatedSpritesList from '../../game-engine/nodes/animated-sprites-list'
+import Vector2 from '../../game-engine/utilities/vector2'
 import { getCollide } from '../../utilities/collide'
 import { GameObjectTypes } from '../../utilities/enums'
-import Time from '../../utilities/importants/time'
+import Time from '../../game-engine/utilities/time'
 import Plant from '../plants/plant'
 import Zombie, { ZOMBIE_SPEED } from './_zombie'
 import AnimationObject from './animations/_animation'
+import { importSpriteSheet } from '../../game-engine/utilities/sprite'
+
+const [onAir1, onAir2, ...onAir] = importSpriteSheet(
+  '/sprites/zombies/pole-vaulting-zombie/on-air.png',
+  new Vector2(16),
+  10
+)
+
+const [running1, running2, running3] = importSpriteSheet(
+  '/sprites/zombies/pole-vaulting-zombie/running.png',
+  new Vector2(16),
+  3
+)
+
+const [walking1, walking2, walking3] = importSpriteSheet(
+  '/sprites/zombies/pole-vaulting-zombie/walking.png',
+  new Vector2(16),
+  3
+)
+
+const [eat1, eat2, eat3] = importSpriteSheet(
+  '/sprites/zombies/pole-vaulting-zombie/eat.png',
+  new Vector2(16),
+  3
+)
+
+const [middle1, middle2, middle3] = importSpriteSheet(
+  '/sprites/zombies/pole-vaulting-zombie/middle.png',
+  new Vector2(16),
+  3
+)
 
 const poleVaultingZombieAnimation = {
   running: {
-    srcs: [
-      '/sprites/zombies/pole-vaulting-zombie/running-1.png',
-      '/sprites/zombies/pole-vaulting-zombie/running-2.png',
-      '/sprites/zombies/pole-vaulting-zombie/running-1.png',
-      '/sprites/zombies/pole-vaulting-zombie/running-3.png',
-    ],
+    sprites: [running1, running2, running1, running3],
     fps: 8,
   },
   jumping: {
-    srcs: [
-      '/sprites/zombies/pole-vaulting-zombie/jumping-1.png',
-      '/sprites/zombies/pole-vaulting-zombie/jumping-2.png',
-      '/sprites/zombies/pole-vaulting-zombie/jumping-3.png',
-      '/sprites/zombies/pole-vaulting-zombie/jumping-4.png',
-      '/sprites/zombies/pole-vaulting-zombie/jumping-5.png',
-      '/sprites/zombies/pole-vaulting-zombie/jumping-6.png',
-    ],
+    sprites: importSpriteSheet(
+      '/sprites/zombies/pole-vaulting-zombie/jumping.png',
+      new Vector2(16),
+      6
+    ),
     fps: 9,
     loop: false,
   },
   fall: {
-    srcs: [
-      '/sprites/zombies/pole-vaulting-zombie/on-air-1.png',
-      '/sprites/zombies/pole-vaulting-zombie/on-air-2.png',
-      '/sprites/zombies/pole-vaulting-zombie/fall-1.png',
-      '/sprites/zombies/pole-vaulting-zombie/fall-2.png',
-      '/sprites/zombies/pole-vaulting-zombie/fall-3.png',
-      '/sprites/zombies/pole-vaulting-zombie/fall-4.png',
-      '/sprites/zombies/pole-vaulting-zombie/fall-5.png',
-      '/sprites/zombies/pole-vaulting-zombie/fall-6.png',
+    sprites: [
+      onAir1,
+      onAir2,
+      ...importSpriteSheet(
+        '/sprites/zombies/pole-vaulting-zombie/fall.png',
+        new Vector2(16),
+        6
+      ),
     ],
     fps: 1,
   },
   onAir: {
-    srcs: [
-      '/sprites/zombies/pole-vaulting-zombie/on-air-1.png',
-      '/sprites/zombies/pole-vaulting-zombie/on-air-2.png',
-      '/sprites/zombies/pole-vaulting-zombie/on-air-3.png',
-      '/sprites/zombies/pole-vaulting-zombie/on-air-4.png',
-      '/sprites/zombies/pole-vaulting-zombie/on-air-5.png',
-      '/sprites/zombies/pole-vaulting-zombie/on-air-6.png',
-      '/sprites/zombies/pole-vaulting-zombie/on-air-7.png',
-      '/sprites/zombies/pole-vaulting-zombie/on-air-8.png',
-      '/sprites/zombies/pole-vaulting-zombie/on-air-9.png',
-      '/sprites/zombies/pole-vaulting-zombie/on-air-10.png',
-    ],
+    sprites: [onAir1, onAir2, ...onAir],
     fps: 5,
     loop: false,
   },
   walking: {
-    srcs: [
-      '/sprites/zombies/pole-vaulting-zombie/walking-1.png',
-      '/sprites/zombies/pole-vaulting-zombie/walking-2.png',
-      '/sprites/zombies/pole-vaulting-zombie/walking-1.png',
-      '/sprites/zombies/pole-vaulting-zombie/walking-3.png',
-    ],
+    sprites: [walking1, walking2, walking1, walking3],
     fps: 4,
   },
   'walking-eat': {
-    srcs: [
-      '/sprites/zombies/pole-vaulting-zombie/eat-1.png',
-      '/sprites/zombies/pole-vaulting-zombie/eat-2.png',
-      '/sprites/zombies/pole-vaulting-zombie/eat-1.png',
-      '/sprites/zombies/pole-vaulting-zombie/eat-3.png',
-    ],
+    sprites: [eat1, eat2, eat1, eat3],
     fps: 4,
   },
   middle: {
-    srcs: [
-      '/sprites/zombies/pole-vaulting-zombie/middle-1.png',
-      '/sprites/zombies/pole-vaulting-zombie/middle-2.png',
-      '/sprites/zombies/pole-vaulting-zombie/middle-1.png',
-      '/sprites/zombies/pole-vaulting-zombie/middle-3.png',
-    ],
+    sprites: [middle1, middle2, middle1, middle3],
     fps: 4,
   },
   'middle-eat': {
-    srcs: [
-      '/sprites/zombies/pole-vaulting-zombie/eat-middle-1.png',
-      '/sprites/zombies/pole-vaulting-zombie/eat-middle-2.png',
-      '/sprites/zombies/pole-vaulting-zombie/eat-middle-1.png',
-      '/sprites/zombies/pole-vaulting-zombie/eat-middle-2.png',
-    ],
-    fps: 4,
+    sprites: importSpriteSheet(
+      '/sprites/zombies/pole-vaulting-zombie/eat-middle.png',
+      new Vector2(16),
+      2
+    ),
+    fps: 8,
   },
 }
 
@@ -186,7 +181,6 @@ export default class PoleVaultingZombie extends Zombie {
 
   animationList = new AnimatedSpritesList(
     this.transform,
-    new Vector2(16, 16),
     poleVaultingZombieAnimation,
     'running'
   )
@@ -213,20 +207,12 @@ class Stick extends AnimationObject {
   constructor(pos: Vector2) {
     super(
       pos,
-      [
-        '/sprites/zombies/pole-vaulting-zombie/stick-1.png',
-        '/sprites/zombies/pole-vaulting-zombie/stick-2.png',
-        '/sprites/zombies/pole-vaulting-zombie/stick-3.png',
-        '/sprites/zombies/pole-vaulting-zombie/stick-4.png',
-        '/sprites/zombies/pole-vaulting-zombie/stick-5.png',
-        '/sprites/zombies/pole-vaulting-zombie/stick-6.png',
-        '/sprites/zombies/pole-vaulting-zombie/stick-7.png',
-        '/sprites/zombies/pole-vaulting-zombie/stick-8.png',
-        '/sprites/zombies/pole-vaulting-zombie/stick-9.png',
-        '/sprites/zombies/pole-vaulting-zombie/stick-10.png',
-      ],
+      importSpriteSheet(
+        '/sprites/zombies/pole-vaulting-zombie/stick.png',
+        new Vector2(16),
+        10
+      ),
       10,
-      new Vector2(16, 16),
       { loop: false }
     )
   }
@@ -235,20 +221,12 @@ class PoleVaultingArm extends AnimationObject {
   constructor(pos: Vector2) {
     super(
       pos,
-      [
-        '/sprites/zombies/arm/pole-vaulting-arm-falling-1.png',
-        '/sprites/zombies/arm/pole-vaulting-arm-falling-2.png',
-        '/sprites/zombies/arm/pole-vaulting-arm-falling-3.png',
-        '/sprites/zombies/arm/pole-vaulting-arm-falling-4.png',
-        '/sprites/zombies/arm/pole-vaulting-arm-falling-5.png',
-        '/sprites/zombies/arm/pole-vaulting-arm-falling-6.png',
-        '/sprites/zombies/arm/pole-vaulting-arm-falling-7.png',
-        '/sprites/zombies/arm/pole-vaulting-arm-falling-8.png',
-        '/sprites/zombies/arm/pole-vaulting-arm-falling-9.png',
-        '/sprites/zombies/arm/pole-vaulting-arm-falling-10.png',
-      ],
+      importSpriteSheet(
+        '/sprites/zombies/arm/pole-vaulting-arm-falling.png',
+        new Vector2(16),
+        10
+      ),
       10,
-      new Vector2(16, 16),
       { loop: false }
     )
   }

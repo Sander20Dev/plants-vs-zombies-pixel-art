@@ -6,6 +6,8 @@ import PotatoMine from '../../go/plants/potato-mine'
 import Repeater from '../../go/plants/repeater'
 import Sunflower from '../../go/plants/sunflower'
 import WallNut from '../../go/plants/wall-nut'
+import PuffShroom from '../../go/plants/night/puff-shroom'
+import SunShroom from '../../go/plants/night/sun-shroom'
 
 export enum PLANTS {
   PEASHOOTER = 'peashooter',
@@ -16,6 +18,9 @@ export enum PLANTS {
   SNOW_PEA = 'snow-pea',
   CHOMPER = 'chomper',
   REAPEATER = 'repeater',
+
+  PUFF_SHROOM = 'puff-shroom',
+  SUN_SHROOM = 'sun-shroom',
 }
 
 export const allPlants = [
@@ -27,6 +32,9 @@ export const allPlants = [
   PLANTS.SNOW_PEA,
   PLANTS.CHOMPER,
   PLANTS.REAPEATER,
+
+  PLANTS.PUFF_SHROOM,
+  PLANTS.SUN_SHROOM,
 ]
 
 export const plantsClasses = {
@@ -38,6 +46,9 @@ export const plantsClasses = {
   [PLANTS.SNOW_PEA]: SnowPea,
   [PLANTS.CHOMPER]: Chomper,
   [PLANTS.REAPEATER]: Repeater,
+
+  [PLANTS.PUFF_SHROOM]: PuffShroom,
+  [PLANTS.SUN_SHROOM]: SunShroom,
 }
 
 export const plantsInfo: Record<
@@ -79,6 +90,15 @@ export const plantsInfo: Record<
     price: 8,
     health: 500,
   },
+
+  [PLANTS.PUFF_SHROOM]: {
+    price: 0,
+    health: 500,
+  },
+  [PLANTS.SUN_SHROOM]: {
+    price: 1,
+    health: 400,
+  },
 }
 
 export const defaultLoadingSeeds = {
@@ -113,6 +133,15 @@ export const defaultLoadingSeeds = {
   [PLANTS.REAPEATER]: {
     timeout: 15,
     current: 0,
+  },
+
+  [PLANTS.PUFF_SHROOM]: {
+    timeout: 10,
+    current: 0,
+  },
+  [PLANTS.SUN_SHROOM]: {
+    timeout: 5,
+    current: 5,
   },
 }
 

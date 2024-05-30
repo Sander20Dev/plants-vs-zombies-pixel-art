@@ -1,12 +1,12 @@
 import Scene from '../scenes/_scene'
-import { Views } from '../loader'
+import { Views } from '../game-engine/lib/loader'
 import { selectedPlant, suns } from '../states'
 import {
   PLANTS,
   defaultLoadingSeeds,
   loadingSeeds,
 } from '../utilities/enums/plants'
-import { clearAudios } from '../utilities/media-storage'
+import { clearAudios } from '../game-engine/utilities/media-manager/media-storage'
 
 class ScenesManager {
   currentScene: typeof Scene | null = null
