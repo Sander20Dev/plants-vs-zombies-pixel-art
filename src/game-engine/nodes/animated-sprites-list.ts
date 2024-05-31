@@ -43,7 +43,8 @@ export default class AnimatedSpritesList extends NodeAbs {
     { animationIndex = 0 } = {}
   ) {
     if (animationName === this.currentAnimationName) return
-    if (this.animations[animationName] == null) return
+    if (this.animations[animationName] == null)
+      throw new Error(animationName + ' is not an animation!')
     this.currentAnimationName = animationName
     if (this.animations[animationName] instanceof AnimatedSprite) {
       ;(this.animations[animationName] as AnimatedSprite).currentAnimation =

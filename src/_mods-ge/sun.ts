@@ -17,7 +17,7 @@ export default class Sun extends GameObject {
 
   #sprite
 
-  constructor(pos: Vector2, public price: number = 2) {
+  constructor(pos: Vector2, public price: number = 25) {
     super(GameObjectTypes.SUN, pos)
 
     const scale = new Vector2(8, 8)
@@ -26,7 +26,7 @@ export default class Sun extends GameObject {
 
     this.#clickable.onClick = this.#onClick
     this.#sprite = new Sprite(
-      '/sprites/ui/' + (price === 1 ? 'small-sun' : 'sun') + '.png',
+      '/sprites/ui/' + (price === 15 ? 'small-sun' : 'sun') + '.png',
       this.transform,
       {
         rawCoords: true,

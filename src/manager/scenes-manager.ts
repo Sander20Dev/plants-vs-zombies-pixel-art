@@ -1,11 +1,7 @@
 import Scene from '../scenes/_scene'
 import { Views } from '../game-engine/lib/loader'
 import { selectedPlant, suns } from '../states'
-import {
-  PLANTS,
-  defaultLoadingSeeds,
-  loadingSeeds,
-} from '../utilities/enums/plants'
+import { defaultLoadingSeeds, loadingSeeds } from '../utilities/enums/plants'
 import { clearAudios } from '../game-engine/utilities/media-manager/media-storage'
 
 class ScenesManager {
@@ -26,18 +22,15 @@ class ScenesManager {
     }
 
     clearAudios()
-    suns.current = 0
-    selectedPlant.current = null
-    for (const plant in defaultLoadingSeeds) {
-      if (Object.prototype.hasOwnProperty.call(defaultLoadingSeeds, plant)) {
-        loadingSeeds[plant as PLANTS] = defaultLoadingSeeds[plant as PLANTS]
-      }
-    }
     Views.clean()
 
     new scene(...(props as ConstructorParameters<typeof Scene>))
     this.currentScene = scene
     this.lastProps = props
+
+    loadingSeeds.current = structuredClone(defaultLoadingSeeds)
+    suns.current = 50
+    selectedPlant.current = null
   }
 }
 

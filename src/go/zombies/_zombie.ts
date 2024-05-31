@@ -9,6 +9,7 @@ import Plant from '../plants/plant'
 import Headless, { Fired } from './animations/headless'
 import ZombieArm from './animations/zombie-arm'
 import { importSpriteSheet } from '../../game-engine/utilities/sprite'
+import { Counter } from '../../utilities/delta'
 
 const [eat1, eat2, eat3] = importSpriteSheet(
   '/sprites/zombies/zombie/eat.png',
@@ -92,6 +93,10 @@ export default class Zombie extends Entity {
   }
 
   effects = new Effects(5, 5)
+
+  #attackedCounter = new Counter(0.1, () => {
+    this.animationList.filters = 'none'
+  })
 
   #onSetCold(cold: boolean) {
     this.localTimeRate = cold ? 0.5 : 1
@@ -183,6 +188,8 @@ export default class Zombie extends Entity {
   }
 
   update(): void {
+    this.#attackedCounter.updater()
+
     this.effects.update(() => {
       this.#update()
       this.onUpdate()
@@ -199,6 +206,11 @@ export default class Zombie extends Entity {
       } else if (reason == null) {
         new Headless(this.transform)
       }
+    } else {
+      this.animationList.filters = 'brightness(150%)'
+
+      this.#attackedCounter.restart()
+      this.#attackedCounter.play()
     }
 
     super.attack(damage)

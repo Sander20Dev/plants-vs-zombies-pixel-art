@@ -1,4 +1,5 @@
 import { canvas } from '../../../game-engine/game-object'
+import SpriteTexture from '../../../game-engine/utilities/sprite'
 import Vector2 from '../../../game-engine/utilities/vector2'
 import { scenes } from '../../../manager/scenes-manager'
 import { State, UseStates } from '../../../ui/lib'
@@ -14,7 +15,12 @@ function cpx(count: number, px: number) {
 export default class SelectPlants extends Scene {
   constructor(difficulty: number) {
     setupUI(difficulty)
-    super([new Background('/sprites/ui/maps/day/bg.png', new Vector2(-96, 0))])
+    super([
+      new Background(
+        new SpriteTexture('/sprites/ui/maps/day/bg.png'),
+        new Vector2(-96, 0)
+      ),
+    ])
   }
 }
 

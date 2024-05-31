@@ -12,13 +12,15 @@ import Spore from '../../projectils/spore'
 import NightPlant from './plant'
 
 const idle = importSpriteSheet(
-  '/sprites/plants/night/puff-shroom/idle.png',
+  '/sprites/plants/night/scaredy-shroom/idle.png',
   new Vector2(16),
   2
 )
-const attack = new SpriteTexture('/sprites/plants/night/puff-shroom/attack.png')
+const attack = new SpriteTexture(
+  '/sprites/plants/night/scaredy-shroom/attack.png'
+)
 
-export default class PuffShroom extends NightPlant {
+export default class ScaredyShroom extends NightPlant {
   animationList = new AnimatedSpritesList(
     this.transform,
     {
@@ -31,6 +33,32 @@ export default class PuffShroom extends NightPlant {
         fps: 4 / SHOOT_VELOCITY,
         loop: false,
       },
+      hiding: {
+        sprites: importSpriteSheet(
+          '/sprites/plants/night/scaredy-shroom/hiding.png',
+          new Vector2(16),
+          5
+        ),
+        fps: 5,
+        loop: false,
+      },
+      wakingUp: {
+        sprites: importSpriteSheet(
+          '/sprites/plants/night/scaredy-shroom/hiding.png',
+          new Vector2(16),
+          5
+        ).reverse(),
+        fps: 5,
+        loop: false,
+      },
+      hide: {
+        sprites: importSpriteSheet(
+          '/sprites/plants/night/scaredy-shroom/hide.png',
+          new Vector2(16),
+          2
+        ),
+        fps: 8,
+      },
       sleep: {
         sprites: [idle[1]],
         fps: 1,
@@ -41,16 +69,14 @@ export default class PuffShroom extends NightPlant {
 
   #attacking = false
 
-  maxPos
-
   constructor(pos: Vector2) {
-    super(pos, PLANTS.PUFF_SHROOM)
+    super(pos, PLANTS.SCAREDY_SHROOM)
     this.animationList.animations.idle.onChange = (index) => {
       if (index === 3) {
         this.#attacking = hasAZombie(
-          this.transform.roundedX + 7,
+          this.transform.roundedX + 9,
           this.transform.roundedY,
-          this.maxPos.add(new Vector2(-this.transform.x - 7, 0)).x,
+          184 - this.transform.x - 9,
           16
         )
 
@@ -63,19 +89,21 @@ export default class PuffShroom extends NightPlant {
     this.animationList.animations.attack.onEnd = () => {
       this.animationList.setCurrentAnimation('idle', true)
     }
-
-    this.maxPos = new Vector2(
-      Math.min(this.transform.roundedX + 64, 200),
-      this.transform.y
-    )
+    this.animationList.animations.hiding.onEnd = () => {
+      this.animationList.setCurrentAnimation('hide', true)
+    }
+    this.animationList.animations.wakingUp.onEnd = () => {
+      this.hiding = false
+      this.animationList.setCurrentAnimation('idle', true)
+    }
 
     this.nodes.push(this.animationList)
   }
 
   collision: Collision = new Collision(
     this,
-    new Vector2(4, 9),
-    new Vector2(7, 7)
+    new Vector2(4, 6),
+    new Vector2(6, 10)
   )
 
   #generateASpore() {
@@ -84,9 +112,26 @@ export default class PuffShroom extends NightPlant {
     // } else {
     //   this.#audiosList.throw2.play()
     // }
-    new Spore(
-      new Vector2(this.transform.x + 11, this.transform.y + 11),
-      this.maxPos
-    )
+    new Spore(new Vector2(this.transform.x + 11, this.transform.y + 9))
+  }
+
+  hiding = false
+  update(): void {
+    if (!this.sleeping) {
+      if (hasAZombie(this.transform.x - 16, this.transform.y - 16, 48, 48)) {
+        if (this.hiding) return
+        this.hiding = true
+        this.animationList.setCurrentAnimation('hiding', true)
+        return
+      }
+
+      if (this.hiding) {
+        if (this.animationList.currentAnimationName === 'hide') {
+          this.animationList.setCurrentAnimation('wakingUp', true)
+        }
+      }
+    }
+
+    super.update()
   }
 }

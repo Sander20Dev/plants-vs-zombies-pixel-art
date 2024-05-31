@@ -8,6 +8,8 @@ import Sunflower from '../../go/plants/sunflower'
 import WallNut from '../../go/plants/wall-nut'
 import PuffShroom from '../../go/plants/night/puff-shroom'
 import SunShroom from '../../go/plants/night/sun-shroom'
+import FumeShroom from '../../go/plants/night/fume-shroom'
+import ScaredyShroom from '../../go/plants/night/scaredy-shroom'
 
 export enum PLANTS {
   PEASHOOTER = 'peashooter',
@@ -21,6 +23,8 @@ export enum PLANTS {
 
   PUFF_SHROOM = 'puff-shroom',
   SUN_SHROOM = 'sun-shroom',
+  FUME_SHROOM = 'fume-shroom',
+  SCAREDY_SHROOM = 'scaredy-shroom',
 }
 
 export const allPlants = [
@@ -35,6 +39,8 @@ export const allPlants = [
 
   PLANTS.PUFF_SHROOM,
   PLANTS.SUN_SHROOM,
+  PLANTS.FUME_SHROOM,
+  PLANTS.SCAREDY_SHROOM,
 ]
 
 export const plantsClasses = {
@@ -49,6 +55,8 @@ export const plantsClasses = {
 
   [PLANTS.PUFF_SHROOM]: PuffShroom,
   [PLANTS.SUN_SHROOM]: SunShroom,
+  [PLANTS.FUME_SHROOM]: FumeShroom,
+  [PLANTS.SCAREDY_SHROOM]: ScaredyShroom,
 }
 
 export const plantsInfo: Record<
@@ -56,38 +64,38 @@ export const plantsInfo: Record<
   { price: number; health: number; damage?: number }
 > = {
   [PLANTS.PEASHOOTER]: {
-    price: 4,
-    health: 300,
+    price: 100,
+    health: 500,
   },
   [PLANTS.SUNFLOWER]: {
-    price: 2,
-    health: 400,
+    price: 50,
+    health: 500,
   },
   [PLANTS.CHERRY_BOMB]: {
-    price: 6,
+    price: 150,
     health: 4000,
     damage: 1800,
   },
   [PLANTS.WALL_NUT]: {
-    price: 2,
+    price: 50,
     health: 4000,
   },
   [PLANTS.POTATO_MINE]: {
-    price: 1,
+    price: 25,
     health: 450,
     damage: 1800,
   },
   [PLANTS.SNOW_PEA]: {
-    price: 7,
-    health: 400,
+    price: 175,
+    health: 500,
   },
   [PLANTS.CHOMPER]: {
-    price: 6,
+    price: 150,
     health: 600,
     damage: 1800,
   },
   [PLANTS.REAPEATER]: {
-    price: 8,
+    price: 200,
     health: 500,
   },
 
@@ -96,8 +104,16 @@ export const plantsInfo: Record<
     health: 500,
   },
   [PLANTS.SUN_SHROOM]: {
-    price: 1,
+    price: 25,
     health: 400,
+  },
+  [PLANTS.FUME_SHROOM]: {
+    price: 75,
+    health: 500,
+  },
+  [PLANTS.SCAREDY_SHROOM]: {
+    price: 25,
+    health: 500,
   },
 }
 
@@ -143,6 +159,14 @@ export const defaultLoadingSeeds = {
     timeout: 5,
     current: 5,
   },
+  [PLANTS.FUME_SHROOM]: {
+    timeout: 10,
+    current: 0,
+  },
+  [PLANTS.SCAREDY_SHROOM]: {
+    timeout: 10,
+    current: 0,
+  },
 }
 
-export const loadingSeeds = structuredClone(defaultLoadingSeeds)
+export const loadingSeeds = { current: structuredClone(defaultLoadingSeeds) }

@@ -5,13 +5,13 @@ import Pause from '../../../go/ui/buttons/pause'
 import Seeds from '../../../go/ui/seeds'
 import SunCounter from '../../../go/ui/sun-counter'
 import { PLANTS } from '../../../utilities/enums/plants'
+import { Theme } from '../../../utilities/enums/theme'
 import { ZOMBIES } from '../../../utilities/enums/zombie'
 import Scene from '../../_scene'
 
 export default class DayMap extends Scene {
   constructor(
     plants: PLANTS[],
-    rows: number,
     difficulty: number,
     zombies: { porcent: number; zombie: ZOMBIES; wave: number }[],
     waves = 0
@@ -34,7 +34,7 @@ export default class DayMap extends Scene {
     super([
       board,
       new SunCounter(),
-      new Seeds(plants),
+      new Seeds(plants, Theme.DAY),
       new SunSpawner(),
       zombieSpawner,
       pauseButton,

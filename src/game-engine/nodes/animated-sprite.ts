@@ -87,9 +87,7 @@ export default class AnimatedSprite extends NodeAbs {
 
         if (!this.options.loop) {
           if (this.currentAnimation >= this.#animations.length && this.played) {
-            this.currentAnimation = 0
-          } else if (this.currentAnimation + 1 >= this.#animations.length) {
-            this.currentAnimation = this.currentAnimation
+            this.currentAnimation = this.#animations.length - 1
             this.played = false
             end = true
           }

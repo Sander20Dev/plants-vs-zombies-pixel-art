@@ -12,19 +12,27 @@ import {
 } from '../../utilities/enums/plants'
 import Time from '../../game-engine/utilities/time'
 import { getImage } from '../../game-engine/utilities/media-manager/media-storage'
+import { Theme } from '../../utilities/enums/theme'
+import { importSpriteSheet } from '../../game-engine/utilities/sprite'
+import Shovel from './buttons/shovel'
 
 export const images = allPlants.map((plant) => {
-  return { img: getImage('/sprites/ui/seeds/' + plant + '.png', 24, 16), plant }
+  return { img: getImage('/sprites/ui/seeds/' + plant + '.png'), plant }
 })
 
+const readysetplant = importSpriteSheet(
+  '/sprites/ui/views/ready/counter.png',
+  new Vector2(192, 112),
+  4
+)
+
 export default class Seeds extends GameObject {
-  audioList = {
-    grasswalk: new AudioPlayer('/audios/music/grasswalk.mp3', { loop: true }),
-    ready: new AudioPlayer('/audios/effect/readysetplant.ogg'),
-  }
+  audioList
 
   nodes = [
     new Clickable(this.transform, new Vector2(24, 96), (mousePos) => {
+      if (!this.#started) return
+
       const x = Math.floor((mousePos.x - this.transform.x) / 24)
       const y = Math.floor((mousePos.y - this.transform.y) / 16)
 
@@ -36,8 +44,8 @@ export default class Seeds extends GameObject {
       }
       if (
         suns.current < plantsInfo[this.seeds[y]].price ||
-        loadingSeeds[this.seeds[y]].current <
-          loadingSeeds[this.seeds[y]].timeout
+        loadingSeeds.current[this.seeds[y]].current <
+          loadingSeeds.current[this.seeds[y]].timeout
       )
         return
 
@@ -47,19 +55,35 @@ export default class Seeds extends GameObject {
 
   seeds: PLANTS[]
 
-  constructor(seeds: PLANTS[]) {
+  constructor(seeds: PLANTS[], theme: Theme) {
     super(GameObjectTypes.UI, new Vector2(8, 8))
+
+    this.audioList = {
+      musicTheme: new AudioPlayer(
+        theme === Theme.DAY
+          ? '/audios/music/grasswalk.mp3'
+          : '/audios/music/night-theme.ogg',
+        { loop: true }
+      ),
+      ready: new AudioPlayer('/audios/effect/readysetplant.ogg'),
+    }
+
     this.seeds = seeds.slice(0, 6)
-    this.audioList.ready.play()
+    this.audioList.ready.audio.play().then(() => {
+      this.#initCounter = true
+    })
   }
 
+  #shovel = new Shovel(new Vector2(72, 4))
+
+  #initCounter = false
   #init = 0
   #started = false
 
   draw() {
     for (let i = 0; i < this.seeds.length; i++) {
       const plant = this.seeds[i]
-      const timer = loadingSeeds[plant]
+      const timer = loadingSeeds.current[plant]
 
       if (plant === selectedPlant.current) {
         ctx.beginPath()
@@ -75,7 +99,10 @@ export default class Seeds extends GameObject {
 
       const img = images.find(({ plant: p }) => p === plant) ?? images[0]
 
-      if (timer.current < timer.timeout) {
+      if (!this.#started) {
+        ctx.filter = 'grayscale(75%) brightness(75%)'
+        ctx.drawImage(img.img, this.transform.x, this.transform.y + i * 16)
+      } else if (timer.current < timer.timeout) {
         const difference = Math.round((16 * timer.current) / timer.timeout)
         ctx.filter = 'grayscale(100%) brightness(30%)'
         ctx.drawImage(
@@ -138,16 +165,28 @@ export default class Seeds extends GameObject {
   }
 
   update() {
-    if (this.#init < 3) {
+    if (!this.#initCounter) return
+
+    if (!this.#started) {
       this.#init += Time.deltaTime
-    } else if (!this.#started) {
-      this.audioList.grasswalk.play()
-      this.#started = true
+      if (this.#init >= 3) {
+        this.audioList.musicTheme.play()
+        this.#started = true
+        this.#shovel.active()
+      } else if (this.#init >= 2.3) {
+        readysetplant[3].draw(0, 0)
+      } else if (this.#init >= 1.65) {
+        readysetplant[2].draw(0, 0)
+      } else if (this.#init >= 1) {
+        readysetplant[1].draw(0, 0)
+      } else if (this.#init >= 0.35) {
+        readysetplant[0].draw(0, 0)
+      }
     }
 
     for (let i = 0; i < this.seeds.length; i++) {
       const plant = this.seeds[i]
-      if (this.#started) loadingSeeds[plant].current += Time.deltaTime
+      if (this.#started) loadingSeeds.current[plant].current += Time.deltaTime
     }
   }
 }

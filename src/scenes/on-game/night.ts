@@ -3,6 +3,7 @@ import Board from '../../go/ui/board'
 import Pause from '../../go/ui/buttons/pause'
 import Seeds from '../../go/ui/seeds'
 import SunCounter from '../../go/ui/sun-counter'
+import { currentTheme } from '../../states'
 import { PLANTS } from '../../utilities/enums/plants'
 import { Theme } from '../../utilities/enums/theme'
 import { ZOMBIES } from '../../utilities/enums/zombie'
@@ -15,6 +16,8 @@ export default class Night extends Scene {
     zombies: { porcent: number; zombie: ZOMBIES; wave: number }[],
     waves: number
   ) {
+    currentTheme.current = Theme.NIGHT
+
     const zombieSpawner = new ZombieGenerator({
       waves,
       difficultyPerWave: difficulty,
@@ -33,7 +36,7 @@ export default class Night extends Scene {
     super([
       board,
       new SunCounter(),
-      new Seeds(plants),
+      new Seeds(plants, Theme.NIGHT),
       zombieSpawner,
       pauseButton,
     ])

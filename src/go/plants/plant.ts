@@ -5,6 +5,7 @@ import { PLANTS, plantsInfo } from '../../utilities/enums/plants'
 
 export default class Plant extends Entity {
   isLarge = false
+  isNightPlant = false
 
   constructor(pos: Vector2, plant: PLANTS) {
     super(

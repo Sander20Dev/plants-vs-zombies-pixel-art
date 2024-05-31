@@ -1,4 +1,4 @@
-import { GameObject, canvas } from '../../game-engine/game-object'
+import { GameObject } from '../../game-engine/game-object'
 import AudioPlayer from '../../game-engine/nodes/audio-player'
 import Clickable from '../../game-engine/nodes/clickable'
 import Collision from '../../game-engine/nodes/collider'
@@ -13,6 +13,7 @@ import { pauseGame } from '../../game-engine/lib/update'
 import { GameObjectTypes } from '../../utilities/enums'
 import {
   PLANTS,
+  allPlants,
   loadingSeeds,
   plantsClasses,
   plantsInfo,
@@ -87,9 +88,25 @@ export default class Board extends GameObject {
     this.end = bool
   }
 
-  #board: (GameObject | null)[][] = Array(5)
+  #board: {
+    type: 'dirt' | 'water' | 'stone'
+    plant: GameObject | null
+    // protection: GameObject | null,
+    // pot: GameObject | null
+  }[][] = Array(5)
     .fill(0)
-    .map(() => Array(9).fill(null))
+    .map(() =>
+      Array(9)
+        .fill(null)
+        .map(() => {
+          return {
+            type: 'dirt',
+            plant: null,
+            // protection: null,
+            // pot: null,
+          }
+        })
+    )
 
   #onClick(mousePos: Vector2) {
     if (selectedPlant.current == null) return
@@ -105,28 +122,47 @@ export default class Board extends GameObject {
     if (y >= 5 || x >= 9) return
     if (y >= 5) return
 
-    if (this.#board[y][x] != null) return
+    if (allPlants.includes(selectedPlant.current as PLANTS)) {
+      this.#plantAPlant(x, y, selectedPlant.current as PLANTS)
+    } else if (selectedPlant.current === 'SHOVEL') {
+      this.#shovelAction(x, y)
+    }
+  }
 
-    if (Math.random() < 0.5) {
+  #plantAPlant(x: number, y: number, plant: PLANTS) {
+    if (this.#board[y][x].plant == null) {
+      if (Math.random() < 0.5) {
+        this.#audioList.plant.play()
+      } else {
+        this.#audioList.plant2.play()
+      }
+      suns.current -= plantsInfo[plant].price
+      loadingSeeds.current[plant].current = 0
+
+      this.#board[y][x] = {
+        type: this.#board[y][x].type,
+        plant: new plantsClasses[plant](
+          new Vector2(x * 16 + this.transform.x, y * 16 + this.transform.y)
+        ),
+      }
+
+      this.#board[y][x].plant!.onDestroy = () => {
+        this.#plantDestroy(x, y)
+      }
+      selectedPlant.current = null
+    }
+  }
+
+  #shovelAction(x: number, y: number) {
+    if (this.#board[y][x].plant != null) {
+      this.#board[y][x].plant!.destroy()
+      selectedPlant.current = null
       this.#audioList.plant.play()
-    } else {
-      this.#audioList.plant2.play()
     }
-    suns.current -= plantsInfo[selectedPlant.current].price
-    loadingSeeds[selectedPlant.current].current = 0
-
-    this.#board[y][x] = new plantsClasses[selectedPlant.current](
-      new Vector2(x * 16 + this.transform.x, y * 16 + this.transform.y)
-    )
-
-    this.#board[y][x]!.onDestroy = () => {
-      this.#plantDestroy(x, y)
-    }
-    selectedPlant.current = null
   }
 
   #plantDestroy(x: number, y: number) {
-    this.#board[y][x] = null
+    this.#board[y][x].plant = null
   }
 
   onGameLose() {}

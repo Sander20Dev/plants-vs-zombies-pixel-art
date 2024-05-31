@@ -12,7 +12,6 @@ export default class Day extends DayMap {
   constructor(difficulty: DIFFICULTY, seeds: PLANTS[]) {
     super(
       seeds,
-      5,
       difficulty * 0.5,
       difficulty === DIFFICULTY.EASY
         ? [
@@ -76,3 +75,5 @@ export default class Day extends DayMap {
     )
   }
 }
+
+// export default class Nothing {}
