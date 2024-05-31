@@ -1,4 +1,3 @@
-import AnimatedSprite from '../../../game-engine/nodes/animated-sprite'
 import AnimatedSpritesList from '../../../game-engine/nodes/animated-sprites-list'
 import Collision from '../../../game-engine/nodes/collider'
 import SpriteTexture, {

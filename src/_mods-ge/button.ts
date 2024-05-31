@@ -1,8 +1,6 @@
 import { GameObjectTypes } from '../utilities/enums'
 import { GameObject } from '../game-engine/game-object'
-import AnimatedSpritesList, {
-  SpritesList,
-} from '../game-engine/nodes/animated-sprites-list'
+import { SpritesList } from '../game-engine/nodes/animated-sprites-list'
 import Clickable from '../game-engine/nodes/clickable'
 import Vector2 from '../game-engine/utilities/vector2'
 import SpriteTexture from '../game-engine/utilities/sprite'

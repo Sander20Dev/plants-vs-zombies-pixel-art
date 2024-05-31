@@ -6,8 +6,6 @@ import type NodeAbs from '../../game-engine/nodes/node'
 import Sprite from '../../game-engine/nodes/sprite'
 import Vector2 from '../../game-engine/utilities/vector2'
 import { Views } from '../../game-engine/lib/loader'
-import { scenes } from '../../manager/scenes-manager'
-import NewPlantScene from '../../scenes/adventure-mode/new-plant'
 import { selectedPlant, suns } from '../../states'
 import { pauseGame } from '../../game-engine/lib/update'
 import { GameObjectTypes } from '../../utilities/enums'
@@ -18,10 +16,7 @@ import {
   plantsClasses,
   plantsInfo,
 } from '../../utilities/enums/plants'
-import Time from '../../game-engine/utilities/time'
-import { getRandomValue } from '../../utilities/random'
 import LawnMower from '../accesiories/lawn-mower'
-import { images } from './seeds'
 import { Theme } from '../../utilities/enums/theme'
 
 export default class Board extends GameObject {
@@ -181,69 +176,6 @@ export default class Board extends GameObject {
     if (!this.win && this.end && Views.get(GameObjectTypes.ZOMBIE).length < 1) {
       this.onWin()
       this.win = true
-    }
-  }
-}
-
-class NewPlant extends GameObject {
-  audios = {
-    winMusic: new AudioPlayer('/audios/env/winmusic.ogg', { pauseSound: true }),
-  }
-
-  constructor(public plant: PLANTS) {
-    super(
-      GameObjectTypes.ANIMATION,
-      new Vector2(getRandomValue(128, 40), getRandomValue(64, 24))
-    )
-
-    const img = images.find(({ plant: p }) => p === plant)!
-    const sprite = new Sprite(img.img, this.transform, {
-      rawCoords: true,
-    })
-    this.nodes = [sprite]
-
-    this.audios.winMusic.play()
-
-    class A extends NewPlantScene {
-      constructor() {
-        super(plant)
-      }
-    }
-    this.audios.winMusic.audio.onended = () => {
-      scenes.changeScene(A)
-      Time.timeRate = 1
-    }
-  }
-
-  moveTo(to: Vector2, speed: number) {
-    const x = to.x - this.transform.x
-    const y = to.y - this.transform.y
-
-    const distance = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))
-
-    const k = distance / speed
-
-    return new Vector2(x / k, y / k)
-  }
-
-  center = new Vector2(88, 48)
-
-  update(): void {
-    if (
-      (this.transform.roundedX >= this.center.roundedX &&
-        this.transform.roundedY >= this.center.roundedY &&
-        this.transform.roundedX <= this.center.roundedX + 8 &&
-        this.transform.roundedY <= this.center.roundedY + 8) ||
-      this.transform.x < 0 ||
-      this.transform.y < 0
-    ) {
-      this.transform.x = this.center.x
-      this.transform.y = this.center.y
-    } else {
-      const m = this.moveTo(this.center, 50)
-
-      this.transform.x += m.x * Time.deltaTime
-      this.transform.y += m.y * Time.deltaTime
     }
   }
 }
