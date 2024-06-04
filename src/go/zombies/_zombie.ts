@@ -64,8 +64,17 @@ export default class Zombie extends Entity {
   constructor(pos: Vector2, health: number, damage = 100) {
     super(GameObjectTypes.ZOMBIE, pos, health, damage)
 
-    this.effects.onSetCold = (cold) => {
-      this.#onSetCold(cold)
+    this.effects.onChange = (effect) => {
+      console.log(effect)
+
+      this.context.cold = effect != null
+      if (effect === 'cold') {
+        this.localTimeRate = 0.5
+      } else if (effect === 'ice') {
+        this.localTimeRate = 0
+      } else {
+        this.localTimeRate = 1
+      }
     }
 
     this.collision.onUpdate = (plant) => {
@@ -92,18 +101,22 @@ export default class Zombie extends Entity {
     groan6: new AudioPlayer('/audios/zombies/groan6.ogg'),
   }
 
-  effects = new Effects(5, 5)
+  effects = new Effects(15, 3.25)
+
+  context = {
+    attack: false,
+    cold: false,
+  }
+
+  filters = {
+    attack: 'brightness(150%)',
+    cold: 'sepia(45%) hue-rotate(191deg)',
+    coldAndAttack: 'sepia(45%) hue-rotate(191deg) brightness(150%)',
+  }
 
   #attackedCounter = new Counter(0.1, () => {
-    this.animationList.filters = 'none'
+    this.context.attack = false
   })
-
-  #onSetCold(cold: boolean) {
-    this.localTimeRate = cold ? 0.5 : 1
-    this.animationList.filters = cold
-      ? 'sepia(1) hue-rotate(190deg) saturate(0.5)'
-      : 'none'
-  }
 
   collision: Collision = new Collision(
     this,
@@ -165,7 +178,6 @@ export default class Zombie extends Entity {
 
   #update(): void {
     this.zombieGroan()
-    this.setAnimation()
   }
 
   eatPlant(plant: Plant) {
@@ -183,23 +195,28 @@ export default class Zombie extends Entity {
     this.animationList.setCurrentAnimation(this.currentAnimation + '-eat', true)
   }
 
-  onUpdate() {
-    // this.eatPlant()
+  priority(): void {
+    this.#attackedCounter.updater()
+    this.effects.update()
+    this.setAnimation()
+  }
+  draw(): void {
+    if (this.context.attack && this.context.cold) {
+      this.animationList.filters = this.filters.coldAndAttack
+    } else if (this.context.attack) {
+      this.animationList.filters = this.filters.attack
+    } else if (this.context.cold) {
+      this.animationList.filters = this.filters.cold
+    } else {
+      this.animationList.filters = 'none'
+    }
   }
 
   update(): void {
-    this.#attackedCounter.updater()
-
-    this.effects.update(() => {
-      this.#update()
-      this.onUpdate()
-    })
-  }
-  nodesUpdate(nodeUpdate: () => void): void {
-    this.effects.nodeUpdate(nodeUpdate)
+    this.#update()
   }
 
-  attack(damage: number, reason?: 'fire' | 'no-body'): void {
+  attack(damage: number, reason?: 'fire' | 'no-body') {
     if (damage > this.health) {
       if (reason === 'fire') {
         new Fired(this.transform)
@@ -207,65 +224,65 @@ export default class Zombie extends Entity {
         new Headless(this.transform)
       }
     } else {
-      this.animationList.filters = 'brightness(150%)'
+      this.context.attack = true
 
       this.#attackedCounter.restart()
       this.#attackedCounter.play()
     }
 
-    super.attack(damage)
+    return super.attack(damage)
   }
 }
 
 export class Effects {
-  isCold = false
-  isIce = false
+  effect: 'cold' | 'ice' | null = null
 
   constructor(public coldTime: number, public iceTime: number) {}
 
-  setCold(cold: boolean) {
-    this.isCold = cold
-    this.#counterCold = 0
-    this.onSetCold(cold)
+  setCold(_cold: boolean) {
+    this.effect = this.effect === 'ice' ? 'ice' : 'cold'
+    if (this.effect === 'cold') {
+      this.#counterCold = 0
+    }
+    this.onChange(this.effect)
   }
 
-  onSetCold(_cold: boolean) {}
+  setIce(_ice: boolean) {
+    this.effect = 'ice'
+    this.#counterIce = 0
+    this.onChange(this.effect)
+  }
+
+  onChange(effect: typeof this.effect): void
+  onChange() {}
 
   #counterCold = 0
   #coldTime() {
-    if (this.isCold) {
+    if (this.effect === 'cold') {
       this.#counterCold += Time.deltaTime
+
       if (this.#counterCold >= this.coldTime) {
-        this.setCold(false)
+        this.effect = null
+        this.#counterCold = 0
+        this.onChange(this.effect)
       }
-    } else {
-      this.#counterCold = 0
     }
   }
 
-  update(cb: (tr: number) => void) {
+  #counterIce = 0
+  #iceTime() {
+    if (this.effect === 'ice') {
+      this.#counterIce += Time.deltaTime
+
+      if (this.#counterIce >= this.iceTime) {
+        this.effect = null
+        this.setCold(true)
+      }
+    }
+  }
+
+  update() {
     this.#coldTime()
-
-    if (this.isIce) {
-      cb(0)
-      return
-    }
-    if (this.isCold) {
-      cb(0.5)
-      return
-    }
-
-    cb(1)
-  }
-  nodeUpdate(nodeUpdate: (tr: number) => void) {
-    if (this.isIce) {
-      nodeUpdate(0)
-      return
-    }
-    if (this.isCold) {
-      nodeUpdate(0.5)
-      return
-    }
-    nodeUpdate(1)
+    this.#iceTime()
   }
 }

@@ -6,7 +6,12 @@ import type NodeAbs from '../../game-engine/nodes/node'
 import Sprite from '../../game-engine/nodes/sprite'
 import Vector2 from '../../game-engine/utilities/vector2'
 import { Views } from '../../game-engine/lib/loader'
-import { selectedPlant, suns } from '../../states'
+import {
+  currentDifficulty,
+  currentTheme,
+  selectedPlant,
+  suns,
+} from '../../states'
 import { pauseGame } from '../../game-engine/lib/update'
 import { GameObjectTypes } from '../../utilities/enums'
 import {
@@ -18,6 +23,8 @@ import {
 } from '../../utilities/enums/plants'
 import LawnMower from '../accesiories/lawn-mower'
 import { Theme } from '../../utilities/enums/theme'
+import Tomb from '../accesiories/tomb'
+import { getRandomValue } from '../../utilities/random'
 
 export default class Board extends GameObject {
   endGame = false
@@ -48,13 +55,13 @@ export default class Board extends GameObject {
   ]
   lawnMowers: (LawnMower | null)[]
 
-  constructor(public theme = Theme.DAY) {
+  constructor() {
     super(GameObjectTypes.BACKGROUND, new Vector2(40, 24))
 
     this.nodes.push(
       new Sprite(
         '/sprites/ui/maps/' +
-          (theme === Theme.DAY ? 'day' : 'night') +
+          (currentTheme.current === Theme.DAY ? 'day' : 'night') +
           '/bg.png',
         new Vector2(0, 0)
       )
@@ -75,6 +82,43 @@ export default class Board extends GameObject {
         }
       }
     }
+
+    if (currentTheme.current === Theme.NIGHT) {
+      const { min, max } = {
+        min: currentDifficulty.current + 1,
+        max: currentDifficulty.current * 2 + 2,
+      }
+
+      const randomCount = getRandomValue(max + 1, min)
+
+      const positions: Vector2[] = []
+
+      for (let y = 0; y < 5; y++) {
+        for (let x = 5 - currentDifficulty.current; x < 9; x++) {
+          if (
+            this.#board[y][x].block == null &&
+            this.#board[y][x].plant == null
+          ) {
+            positions.push(new Vector2(x, y))
+          }
+        }
+      }
+
+      const count = Math.min(positions.length, randomCount)
+
+      for (let i = 0; i < count; i++) {
+        const index = getRandomValue(positions.length)
+
+        const { x, y } = positions[index]
+
+        const tomb = new Tomb(new Vector2(40 + x * 16, 24 + y * 16))
+        tomb.onDestroy = () => {
+          this.#board[y][x].block = null
+        }
+        this.#board[y][x].block = tomb
+        positions.splice(index, 1)
+      }
+    }
   }
 
   end = false
@@ -88,6 +132,7 @@ export default class Board extends GameObject {
     plant: GameObject | null
     // protection: GameObject | null,
     // pot: GameObject | null
+    block: GameObject | null
   }[][] = Array(5)
     .fill(0)
     .map(() =>
@@ -99,6 +144,7 @@ export default class Board extends GameObject {
             plant: null,
             // protection: null,
             // pot: null,
+            block: null,
           }
         })
     )
@@ -126,25 +172,46 @@ export default class Board extends GameObject {
 
   #plantAPlant(x: number, y: number, plant: PLANTS) {
     if (this.#board[y][x].plant == null) {
-      if (Math.random() < 0.5) {
-        this.#audioList.plant.play()
-      } else {
-        this.#audioList.plant2.play()
-      }
-      suns.current -= plantsInfo[plant].price
-      loadingSeeds.current[plant].current = 0
+      if (this.#board[y][x].block == null) {
+        if (plant === PLANTS.GRAVE_BUSTER) return
 
-      this.#board[y][x] = {
-        type: this.#board[y][x].type,
-        plant: new plantsClasses[plant](
+        if (Math.random() < 0.5) {
+          this.#audioList.plant.play()
+        } else {
+          this.#audioList.plant2.play()
+        }
+        suns.current -= plantsInfo[plant].price
+        loadingSeeds.current[plant].current = 0
+
+        this.#board[y][x].plant = new plantsClasses[plant](
           new Vector2(x * 16 + this.transform.x, y * 16 + this.transform.y)
-        ),
-      }
+        )
 
-      this.#board[y][x].plant!.onDestroy = () => {
-        this.#plantDestroy(x, y)
+        this.#board[y][x].plant!.onDestroy = () => {
+          this.#plantDestroy(x, y)
+        }
+        selectedPlant.current = null
+      } else {
+        if (!(this.#board[y][x].block instanceof Tomb)) return
+        if (plant !== PLANTS.GRAVE_BUSTER) return
+        if (Math.random() < 0.5) {
+          this.#audioList.plant.play()
+        } else {
+          this.#audioList.plant2.play()
+        }
+        suns.current -= plantsInfo[plant].price
+        loadingSeeds.current[plant].current = 0
+
+        this.#board[y][x].plant = new plantsClasses[plant](
+          new Vector2(x * 16 + this.transform.x, y * 16 + this.transform.y),
+          this.#board[y][x].block as Tomb
+        )
+
+        this.#board[y][x].plant!.onDestroy = () => {
+          this.#plantDestroy(x, y)
+        }
+        selectedPlant.current = null
       }
-      selectedPlant.current = null
     }
   }
 

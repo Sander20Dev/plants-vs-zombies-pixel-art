@@ -24,13 +24,14 @@ class ScenesManager {
     clearAudios()
     Views.clean()
 
-    new scene(...(props as ConstructorParameters<typeof Scene>))
     this.currentScene = scene
     this.lastProps = props
 
     loadingSeeds.current = structuredClone(defaultLoadingSeeds)
     suns.current = 50
     selectedPlant.current = null
+
+    new scene(...(props as ConstructorParameters<typeof Scene>))
   }
 }
 

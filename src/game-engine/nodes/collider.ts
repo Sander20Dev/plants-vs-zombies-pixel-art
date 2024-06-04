@@ -9,12 +9,13 @@ export default class Collision extends NodeAbs {
   invulnerable = false
 
   options
+  mesh
 
   constructor(
     private gameObj: GameObject,
     public transform: Vector2,
     public scale: Vector2,
-    public mesh?: GameObjectTypes,
+    mesh?: GameObjectTypes | GameObjectTypes[],
     onCollision?: (obj: GameObject) => void,
     { detectInvulnerables = false } = {}
   ) {
@@ -25,6 +26,7 @@ export default class Collision extends NodeAbs {
         onCollision(obj)
       }
     }
+    this.mesh = mesh instanceof Array ? mesh : mesh == null ? [] : [mesh]
   }
 
   get relativeTransform() {
@@ -62,7 +64,7 @@ export default class Collision extends NodeAbs {
 
   update() {
     if (this.mesh != null) {
-      const filteredMesh = Views.get(this.mesh)
+      const filteredMesh = Views.getAll(this.mesh)
 
       if (filteredMesh.length === 0) this.onUpdate()
 
@@ -71,6 +73,7 @@ export default class Collision extends NodeAbs {
 
         if (!this.options.detectInvulnerables && obj.collision.invulnerable)
           continue
+        if (obj === this.gameObj) continue
 
         const collided = this.detectCollision(
           obj.collision.relativeTransform,
@@ -80,13 +83,10 @@ export default class Collision extends NodeAbs {
         if (collided) {
           this.onUpdate(obj)
           this.onCollision(obj)
-          break
-        }
-
-        if (i + 1 === filteredMesh.length) {
-          this.onUpdate()
+          return
         }
       }
+      this.onUpdate()
     }
   }
 }

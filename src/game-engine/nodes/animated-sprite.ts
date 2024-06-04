@@ -9,6 +9,8 @@ export default class AnimatedSprite extends NodeAbs {
   #fps
   options
 
+  filter = 'none'
+
   constructor(
     public transform: Vector2,
     animationSrcs: SpriteTexture[],
@@ -63,14 +65,35 @@ export default class AnimatedSprite extends NodeAbs {
   onChange(currentAnimationIndex: number): void
   onChange() {}
 
-  draw(filter?: string): void {
-    if (filter) ctx.filter = filter
+  draw(props?: { filter?: string; flip?: boolean }): void
+  draw({ filter = undefined, flip = false } = {}) {
+    if (filter) {
+      ctx.filter = filter
+    } else {
+      ctx.filter = this.filter
+    }
 
-    this.#animations[this.currentAnimation].draw(
-      this.transform.roundedX,
-      this.transform.roundedY
-    )
-    if (filter) ctx.filter = 'none'
+    if (flip) {
+      ctx.save()
+      ctx.scale(-1, 1)
+
+      this.#animations[this.currentAnimation].draw(
+        -this.transform.roundedX -
+          (this.#animations[this.currentAnimation].size
+            ? this.#animations[this.currentAnimation].size!.x
+            : 16),
+        this.transform.roundedY
+      )
+    } else {
+      this.#animations[this.currentAnimation].draw(
+        this.transform.roundedX,
+        this.transform.roundedY
+      )
+    }
+
+    ctx.restore()
+
+    ctx.filter = 'none'
   }
 
   update() {
@@ -97,7 +120,7 @@ export default class AnimatedSprite extends NodeAbs {
           }
         }
 
-        this.onChange(this.currentAnimation)
+        if (!end) this.onChange(this.currentAnimation)
       }
     }
 

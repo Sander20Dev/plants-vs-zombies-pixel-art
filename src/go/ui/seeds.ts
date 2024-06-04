@@ -2,7 +2,7 @@ import { GameObject, ctx } from '../../game-engine/game-object'
 import AudioPlayer from '../../game-engine/nodes/audio-player'
 import Clickable from '../../game-engine/nodes/clickable'
 import Vector2 from '../../game-engine/utilities/vector2'
-import { selectedPlant, suns } from '../../states'
+import { currentTheme, selectedPlant, suns } from '../../states'
 import { GameObjectTypes } from '../../utilities/enums'
 import {
   PLANTS,
@@ -11,13 +11,19 @@ import {
   plantsInfo,
 } from '../../utilities/enums/plants'
 import Time from '../../game-engine/utilities/time'
-import { getImage } from '../../game-engine/utilities/media-manager/media-storage'
 import { Theme } from '../../utilities/enums/theme'
 import { importSpriteSheet } from '../../game-engine/utilities/sprite'
 import Shovel from './buttons/shovel'
+import AnimatedSprite from '../../game-engine/nodes/animated-sprite'
 
-export const images = allPlants.map((plant) => {
-  return { img: getImage('/sprites/ui/seeds/' + plant + '.png'), plant }
+const seeds = importSpriteSheet(
+  '/sprites/ui/seeds/seeds.png',
+  new Vector2(24, 16),
+  8,
+  2
+)
+export const images = allPlants.map((plant, i) => {
+  return { img: seeds[i], plant }
 })
 
 const readysetplant = importSpriteSheet(
@@ -29,38 +35,15 @@ const readysetplant = importSpriteSheet(
 export default class Seeds extends GameObject {
   audioList
 
-  nodes = [
-    new Clickable(this.transform, new Vector2(24, 96), (mousePos) => {
-      if (!this.#started) return
-
-      const x = Math.floor((mousePos.x - this.transform.x) / 24)
-      const y = Math.floor((mousePos.y - this.transform.y) / 16)
-
-      if (x !== 0 || y < 0 || y >= this.seeds.length) return
-
-      if (selectedPlant.current === this.seeds[y]) {
-        selectedPlant.current = null
-        return
-      }
-      if (
-        suns.current < plantsInfo[this.seeds[y]].price ||
-        loadingSeeds.current[this.seeds[y]].current <
-          loadingSeeds.current[this.seeds[y]].timeout
-      )
-        return
-
-      selectedPlant.current = this.seeds[y]
-    }),
-  ]
-
   seeds: PLANTS[]
+  selectedSeeds
 
-  constructor(seeds: PLANTS[], theme: Theme) {
+  constructor(seeds: PLANTS[]) {
     super(GameObjectTypes.UI, new Vector2(8, 8))
 
     this.audioList = {
       musicTheme: new AudioPlayer(
-        theme === Theme.DAY
+        currentTheme.current === Theme.DAY
           ? '/audios/music/grasswalk.mp3'
           : '/audios/music/night-theme.ogg',
         { loop: true }
@@ -72,6 +55,10 @@ export default class Seeds extends GameObject {
     this.audioList.ready.audio.play().then(() => {
       this.#initCounter = true
     })
+
+    this.selectedSeeds = this.seeds.map((plant, i) => {
+      return new Seed(this.transform.add(new Vector2(0, i * 16)), plant)
+    })
   }
 
   #shovel = new Shovel(new Vector2(72, 4))
@@ -81,90 +68,6 @@ export default class Seeds extends GameObject {
   #started = false
 
   draw() {
-    for (let i = 0; i < this.seeds.length; i++) {
-      const plant = this.seeds[i]
-      const timer = loadingSeeds.current[plant]
-
-      if (plant === selectedPlant.current) {
-        ctx.beginPath()
-        ctx.fillStyle = '#3CA370'
-        ctx.fillRect(
-          this.transform.x + 2,
-          this.transform.y + i * 16 + 1,
-          20,
-          15
-        )
-        ctx.closePath()
-      }
-
-      const img = images.find(({ plant: p }) => p === plant) ?? images[0]
-
-      if (!this.#started) {
-        ctx.filter = 'grayscale(75%) brightness(75%)'
-        ctx.drawImage(img.img, this.transform.x, this.transform.y + i * 16)
-      } else if (timer.current < timer.timeout) {
-        const difference = Math.round((16 * timer.current) / timer.timeout)
-        ctx.filter = 'grayscale(100%) brightness(30%)'
-        ctx.drawImage(
-          img.img,
-          0,
-          0,
-          24,
-          16 - difference,
-          this.transform.x,
-          this.transform.y + i * 16,
-          24,
-          16 - difference
-        )
-        ctx.filter = 'grayscale(100%) brightness(40%)'
-        ctx.drawImage(
-          img.img,
-          0,
-          16 - difference,
-          24,
-          difference,
-          this.transform.x,
-          this.transform.y + i * 16 + 16 - difference,
-          24,
-          difference
-        )
-        ctx.filter = 'none'
-      } else if (suns.current < plantsInfo[plant].price) {
-        const difference = Math.round(
-          (16 * suns.current) / plantsInfo[plant].price
-        )
-        ctx.filter = 'grayscale(100%) brightness(50%)'
-        ctx.drawImage(
-          img.img,
-          0,
-          0,
-          24,
-          16 - difference,
-          this.transform.x,
-          this.transform.y + i * 16,
-          24,
-          16 - difference
-        )
-        ctx.filter = 'grayscale(50%) brightness(80%)'
-        ctx.drawImage(
-          img.img,
-          0,
-          16 - difference,
-          24,
-          difference,
-          this.transform.x,
-          this.transform.y + i * 16 + 16 - difference,
-          24,
-          difference
-        )
-      } else {
-        ctx.filter = 'none'
-        ctx.drawImage(img.img, this.transform.x, this.transform.y + i * 16)
-      }
-    }
-  }
-
-  update() {
     if (!this.#initCounter) return
 
     if (!this.#started) {
@@ -172,6 +75,8 @@ export default class Seeds extends GameObject {
       if (this.#init >= 3) {
         this.audioList.musicTheme.play()
         this.#started = true
+        this.selectedSeeds.forEach((seed) => seed.start())
+
         this.#shovel.active()
       } else if (this.#init >= 2.3) {
         readysetplant[3].draw(0, 0)
@@ -183,10 +88,154 @@ export default class Seeds extends GameObject {
         readysetplant[0].draw(0, 0)
       }
     }
+  }
+
+  update() {
+    if (!this.#initCounter) return
 
     for (let i = 0; i < this.seeds.length; i++) {
       const plant = this.seeds[i]
-      if (this.#started) loadingSeeds.current[plant].current += Time.deltaTime
+      if (
+        this.#started &&
+        loadingSeeds.current[plant].current <
+          loadingSeeds.current[plant].timeout
+      )
+        loadingSeeds.current[plant].current += Time.deltaTime
+    }
+  }
+}
+
+const allPlantsSprites = allPlants.map((plant) => {
+  return importSpriteSheet(
+    '/sprites/ui/seeds/' + plant + '.png',
+    new Vector2(24, 16),
+    8
+  )
+})
+
+class Seed extends GameObject {
+  sprite
+
+  activeAnimation
+
+  constructor(pos: Vector2, public plant: PLANTS) {
+    super(GameObjectTypes.UI, pos)
+
+    const index = allPlants.indexOf(plant)
+
+    this.sprite = allPlantsSprites[index][0]
+
+    this.activeAnimation = new AnimatedSprite(
+      this.transform,
+      allPlantsSprites[index],
+      8,
+      { loop: false }
+    )
+    this.activeAnimation.ignore = true
+    this.activeAnimation.filter = 'saturate(1.3) brightness(1.3) contrast(0.9)'
+
+    this.nodes.push(
+      new Clickable(this.transform, new Vector2(24, 96), () => {
+        if (!this.started) return
+        if (
+          loadingSeeds.current[this.plant].current <
+          loadingSeeds.current[this.plant].timeout
+        )
+          return
+
+        if (selectedPlant.current !== this.plant) {
+          this.activeAnimation.ignore = false
+          this.activeAnimation.setAnimationIndex(0)
+          this.activeAnimation.play()
+          selectedPlant.current = this.plant
+        } else {
+          selectedPlant.current = null
+        }
+      }),
+      this.activeAnimation
+    )
+  }
+
+  lastSelector: typeof selectedPlant.current = null
+
+  started = false
+  counter = 0
+
+  start() {
+    this.started = true
+  }
+
+  draw() {
+    const timer = loadingSeeds.current[this.plant]
+
+    if (!this.started) {
+      ctx.filter = 'grayscale(75%) brightness(75%)'
+
+      this.sprite.draw(this.transform.x, this.transform.y)
+    } else if (this.plant === selectedPlant.current) {
+      if (this.activeAnimation.ignore) {
+        ctx.filter = 'saturate(150%) brightness(60%)'
+        this.sprite.draw(this.transform.x, this.transform.y)
+      }
+    } else if (timer.current < timer.timeout) {
+      const difference = Math.round((16 * timer.current) / timer.timeout)
+      ctx.filter = 'grayscale(100%) brightness(30%)'
+      this.sprite.freeDraw(
+        0,
+        0,
+        this.transform.x,
+        this.transform.y,
+        24,
+        16 - difference
+      )
+      ctx.filter = 'grayscale(100%) brightness(40%)'
+      this.sprite.freeDraw(
+        0,
+        16 - difference,
+        this.transform.x,
+        this.transform.y + 16 - difference,
+        24,
+        difference
+      )
+      ctx.filter = 'none'
+    } else if (suns.current < plantsInfo[this.plant].price) {
+      const difference = Math.round(
+        (16 * suns.current) / plantsInfo[this.plant].price
+      )
+      ctx.filter = 'grayscale(100%) brightness(50%)'
+      this.sprite.freeDraw(
+        0,
+        0,
+        this.transform.x,
+        this.transform.y,
+        24,
+        16 - difference
+      )
+      ctx.filter = 'grayscale(50%) brightness(80%)'
+      this.sprite.freeDraw(
+        0,
+        16 - difference,
+        this.transform.x,
+        this.transform.y + 16 - difference,
+        24,
+        difference
+      )
+    } else {
+      ctx.filter = 'none'
+      this.sprite.draw(this.transform.x, this.transform.y)
+    }
+
+    ctx.filter = 'none'
+  }
+
+  update(): void {
+    if (this.lastSelector !== selectedPlant.current) {
+      if (this.lastSelector === this.plant) {
+        this.activeAnimation.ignore = true
+        this.activeAnimation.setAnimationIndex(0)
+      }
+
+      this.lastSelector = selectedPlant.current
     }
   }
 }

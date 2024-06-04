@@ -15,6 +15,16 @@ export class Views {
   static get(type: GameObjectTypes) {
     return gameObjects[type]
   }
+  static getAll(type: GameObjectTypes[]) {
+    const all = type.map((t) => Views.get(t))
+    const a: GameObject[] = []
+    for (let i = 0; i < all.length; i++) {
+      for (let j = 0; j < all[i].length; j++) {
+        a.push(all[i][j])
+      }
+    }
+    return a
+  }
 
   static destroyObject(gb: GameObject) {
     const index = Views.get(gb.type).indexOf(gb)

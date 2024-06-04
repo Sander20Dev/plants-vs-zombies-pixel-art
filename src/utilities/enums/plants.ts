@@ -10,6 +10,9 @@ import PuffShroom from '../../go/plants/night/puff-shroom'
 import SunShroom from '../../go/plants/night/sun-shroom'
 import FumeShroom from '../../go/plants/night/fume-shroom'
 import ScaredyShroom from '../../go/plants/night/scaredy-shroom'
+import GraveBuster from '../../go/plants/night/grave-buster'
+import ImpactShroom from '../../go/plants/night/impact-shroom'
+import IceShroom from '../../go/plants/night/ice-shroom'
 
 export enum PLANTS {
   PEASHOOTER = 'peashooter',
@@ -24,7 +27,10 @@ export enum PLANTS {
   PUFF_SHROOM = 'puff-shroom',
   SUN_SHROOM = 'sun-shroom',
   FUME_SHROOM = 'fume-shroom',
+  GRAVE_BUSTER = 'grave-buster',
+  IMPACT_SHROOM = 'impact-shroom',
   SCAREDY_SHROOM = 'scaredy-shroom',
+  ICE_SHROOM = 'ice-shroom',
 }
 
 export const allPlants = [
@@ -40,7 +46,10 @@ export const allPlants = [
   PLANTS.PUFF_SHROOM,
   PLANTS.SUN_SHROOM,
   PLANTS.FUME_SHROOM,
+  PLANTS.GRAVE_BUSTER,
+  PLANTS.IMPACT_SHROOM,
   PLANTS.SCAREDY_SHROOM,
+  PLANTS.ICE_SHROOM,
 ]
 
 export const plantsClasses = {
@@ -56,7 +65,10 @@ export const plantsClasses = {
   [PLANTS.PUFF_SHROOM]: PuffShroom,
   [PLANTS.SUN_SHROOM]: SunShroom,
   [PLANTS.FUME_SHROOM]: FumeShroom,
+  [PLANTS.GRAVE_BUSTER]: GraveBuster,
+  [PLANTS.IMPACT_SHROOM]: ImpactShroom,
   [PLANTS.SCAREDY_SHROOM]: ScaredyShroom,
+  [PLANTS.ICE_SHROOM]: IceShroom,
 }
 
 export const plantsInfo: Record<
@@ -111,8 +123,20 @@ export const plantsInfo: Record<
     price: 75,
     health: 500,
   },
+  [PLANTS.GRAVE_BUSTER]: {
+    price: 75,
+    health: 500,
+  },
+  [PLANTS.IMPACT_SHROOM]: {
+    price: 50,
+    health: 500,
+  },
   [PLANTS.SCAREDY_SHROOM]: {
     price: 25,
+    health: 500,
+  },
+  [PLANTS.ICE_SHROOM]: {
+    price: 75,
     health: 500,
   },
 }
@@ -163,8 +187,20 @@ export const defaultLoadingSeeds = {
     timeout: 10,
     current: 0,
   },
+  [PLANTS.GRAVE_BUSTER]: {
+    timeout: 10,
+    current: 0,
+  },
+  [PLANTS.IMPACT_SHROOM]: {
+    timeout: 10,
+    current: 0,
+  },
   [PLANTS.SCAREDY_SHROOM]: {
     timeout: 10,
+    current: 0,
+  },
+  [PLANTS.ICE_SHROOM]: {
+    timeout: 60,
     current: 0,
   },
 }

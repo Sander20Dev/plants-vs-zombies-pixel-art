@@ -35,7 +35,7 @@ export default class PuffShroom extends NightPlant {
         fps: 1,
       },
     },
-    'idle'
+    'sleep'
   )
 
   #attacking = false

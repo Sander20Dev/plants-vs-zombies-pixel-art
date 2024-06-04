@@ -1,5 +1,4 @@
-import { GameObject, canvas } from '../../game-engine/game-object'
-import { GameObjectTypes } from '../../utilities/enums'
+import { canvas } from '../../game-engine/game-object'
 import AnimatedSprite from '../../game-engine/nodes/animated-sprite'
 import Collision from '../../game-engine/nodes/collider'
 import Sprite from '../../game-engine/nodes/sprite'
@@ -9,10 +8,8 @@ import AudioPlayer from '../../game-engine/nodes/audio-player'
 import Zombie from '../zombies/_zombie'
 import { PLANTS } from '../../utilities/enums/plants'
 import Plant from './plant'
-import Time from '../../game-engine/utilities/time'
-import { PEA_DAMAGE, PEA_VELOCITY } from './peashooter'
 import SpriteTexture from '../../game-engine/utilities/sprite'
-import { SHOOT_VELOCITY } from '../projectils/pea'
+import Pea, { SHOOT_VELOCITY, PEA_DAMAGE } from '../projectils/pea'
 
 const sprites = [
   '/sprites/plants/snow-pea/idle3.png',
@@ -78,19 +75,12 @@ export default class SnowPea extends Plant {
   }
 }
 
-class SnowPeaProjectil extends GameObject {
+class SnowPeaProjectil extends Pea {
   #audioList = {
     splat: new AudioPlayer('/audios/plants/pea/splat.ogg'),
     splat2: new AudioPlayer('/audios/plants/pea/splat2.ogg'),
     splat3: new AudioPlayer('/audios/plants/pea/splat3.ogg'),
   }
-
-  collision: Collision = new Collision(
-    this,
-    Vector2.ZERO,
-    new Vector2(4, 4),
-    GameObjectTypes.ZOMBIE
-  )
 
   nodes = [
     new Sprite('/sprites/projectiles/snow-pea.png', this.transform, {
@@ -99,7 +89,7 @@ class SnowPeaProjectil extends GameObject {
   ]
 
   constructor(pos: Vector2) {
-    super(GameObjectTypes.PROJECTIL, pos)
+    super(pos)
 
     this.collision.onCollision = (zombie) => {
       if (zombie instanceof Zombie) {
@@ -118,11 +108,5 @@ class SnowPeaProjectil extends GameObject {
         this.destroy()
       }
     }
-  }
-
-  update(): void {
-    this.transform.x += Time.deltaTime * PEA_VELOCITY
-
-    if (this.transform.x >= canvas.width) this.destroy()
   }
 }

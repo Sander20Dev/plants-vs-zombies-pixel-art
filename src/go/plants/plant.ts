@@ -7,7 +7,7 @@ export default class Plant extends Entity {
   isLarge = false
   isNightPlant = false
 
-  constructor(pos: Vector2, plant: PLANTS) {
+  constructor(pos: Vector2, public plant: PLANTS) {
     super(
       GameObjectTypes.PLANT,
       pos,

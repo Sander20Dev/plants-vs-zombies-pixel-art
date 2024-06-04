@@ -4,7 +4,7 @@ import Vector2 from '../../../game-engine/utilities/vector2'
 import { scenes } from '../../../manager/scenes-manager'
 import Background from '../../../ui/utils/background'
 import Scene from '../../_scene'
-import { DIFFICULTY } from '../game/day'
+import { DIFFICULTY } from '../../../utilities/enums/difficulty'
 import SelectPlants from '../select-plants'
 
 export default class SelectDifficulty extends Scene {

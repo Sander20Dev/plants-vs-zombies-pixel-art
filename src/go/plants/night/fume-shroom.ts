@@ -50,7 +50,7 @@ export default class FumeShroom extends NightPlant {
         fps: 1,
       },
     },
-    'idle'
+    'sleep'
   )
 
   maxPos

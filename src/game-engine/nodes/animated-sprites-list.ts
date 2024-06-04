@@ -36,6 +36,7 @@ export default class AnimatedSpritesList extends NodeAbs {
   onChangeAnimation() {}
 
   filters = 'none'
+  flip = false
 
   setCurrentAnimation(
     animationName: string,
@@ -60,7 +61,10 @@ export default class AnimatedSpritesList extends NodeAbs {
   }
 
   draw(): void {
-    this.animations[this.currentAnimationName].draw(this.filters)
+    this.animations[this.currentAnimationName].draw({
+      filter: this.filters,
+      flip: this.flip,
+    })
   }
   update(): void {
     this.animations[this.currentAnimationName].update()

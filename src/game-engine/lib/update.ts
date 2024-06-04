@@ -55,7 +55,14 @@ function update(time: number) {
     if (timeRate !== 0) {
       gameObj.update()
     }
-    gameObj.priority()
+
+    if (Time.timeRate !== 0) {
+      Time.deltaTime = delta
+      gameObj.priority()
+      Time.deltaTime = delta * timeRate
+    } else {
+      gameObj.priority()
+    }
     gameObj.draw()
   }
 

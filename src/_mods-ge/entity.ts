@@ -15,6 +15,10 @@ export default class Entity extends GameObject {
   attack(damage: number) {
     this.health -= damage
 
-    if (this.health <= 0) this.destroy()
+    if (this.health <= 0) {
+      this.destroy()
+    }
+
+    return this.health <= 0
   }
 }

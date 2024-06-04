@@ -53,7 +53,7 @@ export default class SunShroom extends NightPlant {
         fps: 1,
       },
     },
-    'small'
+    'sleep'
   )
 
   large = false

@@ -70,6 +70,3 @@ export default class Peashooter extends Plant {
     this.#animation.changeAnAnimation(3, sprites[this.#attacking ? 1 : 0])
   }
 }
-
-export const PEA_VELOCITY = 100
-export const PEA_DAMAGE = 20
