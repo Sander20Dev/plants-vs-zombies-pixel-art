@@ -25,6 +25,9 @@ import LawnMower from '../accesiories/lawn-mower'
 import { Theme } from '../../utilities/enums/theme'
 import Tomb from '../accesiories/tomb'
 import { getRandomValue } from '../../utilities/random'
+import SpriteTexture from '../../game-engine/utilities/sprite'
+import { boards, MAPS, mapsBoardInfo } from '../../utilities/enums/maps'
+import { FLOOR_TYPE, PLANT_TYPE } from '../../utilities/enums/plants-props'
 
 export default class Board extends GameObject {
   endGame = false
@@ -55,25 +58,43 @@ export default class Board extends GameObject {
   ]
   lawnMowers: (LawnMower | null)[]
 
-  constructor() {
-    super(GameObjectTypes.BACKGROUND, new Vector2(40, 24))
+  mapInfo
+  #board
 
-    this.nodes.push(
-      new Sprite(
-        '/sprites/ui/maps/' +
-          (currentTheme.current === Theme.DAY ? 'day' : 'night') +
-          '/bg.png',
-        new Vector2(0, 0)
-      )
+  constructor(public map = MAPS.NORMAL) {
+    const mapInfo = mapsBoardInfo[map]
+    super(GameObjectTypes.BACKGROUND, new Vector2(40, mapInfo.marginTop))
+
+    this.mapInfo = mapInfo
+    this.#board = boards[this.map]
+
+    const sprite = new SpriteTexture(
+      '/sprites/ui/maps/' +
+        (currentTheme.current === Theme.DAY
+          ? map === MAPS.NORMAL
+            ? 'day'
+            : 'pool'
+          : map === MAPS.NORMAL
+          ? 'night'
+          : 'night-pool') +
+        '/bg-mini.png'
     )
+    sprite.scale = 2
+    this.nodes.push(new Sprite(sprite, new Vector2(0, 0)))
 
-    this.lawnMowers = [
-      new LawnMower(new Vector2(24, 24)),
-      new LawnMower(new Vector2(24, 40)),
-      new LawnMower(new Vector2(24, 56)),
-      new LawnMower(new Vector2(24, 72)),
-      new LawnMower(new Vector2(24, 88)),
-    ]
+    this.lawnMowers = Array(mapInfo.verticalCellCount)
+      .fill(0)
+      .map(
+        (_, i) =>
+          new LawnMower(
+            new Vector2(
+              24,
+              i * this.mapInfo.cellHeight +
+                this.transform.y -
+                (16 - this.mapInfo.cellHeight)
+            )
+          )
+      )
 
     for (let i = 0; i < this.lawnMowers.length; i++) {
       if (this.lawnMowers[i] != null) {
@@ -104,19 +125,26 @@ export default class Board extends GameObject {
         }
       }
 
-      const count = Math.min(positions.length, randomCount)
+      if (currentTheme.current === Theme.NIGHT) {
+        const count = Math.min(positions.length, randomCount)
 
-      for (let i = 0; i < count; i++) {
-        const index = getRandomValue(positions.length)
+        for (let i = 0; i < count; i++) {
+          const index = getRandomValue(positions.length)
 
-        const { x, y } = positions[index]
+          const { x, y } = positions[index]
 
-        const tomb = new Tomb(new Vector2(40 + x * 16, 24 + y * 16))
-        tomb.onDestroy = () => {
-          this.#board[y][x].block = null
+          const tomb = new Tomb(
+            new Vector2(
+              40 + x * mapInfo.cellWidth,
+              mapInfo.marginTop + y * mapInfo.cellHeight
+            )
+          )
+          tomb.onDestroy = () => {
+            this.#board[y][x].block = null
+          }
+          this.#board[y][x].block = tomb
+          positions.splice(index, 1)
         }
-        this.#board[y][x].block = tomb
-        positions.splice(index, 1)
       }
     }
   }
@@ -127,41 +155,25 @@ export default class Board extends GameObject {
     this.end = bool
   }
 
-  #board: {
-    type: 'dirt' | 'water' | 'stone'
-    plant: GameObject | null
-    // protection: GameObject | null,
-    // pot: GameObject | null
-    block: GameObject | null
-  }[][] = Array(5)
-    .fill(0)
-    .map(() =>
-      Array(9)
-        .fill(null)
-        .map(() => {
-          return {
-            type: 'dirt',
-            plant: null,
-            // protection: null,
-            // pot: null,
-            block: null,
-          }
-        })
-    )
-
   #onClick(mousePos: Vector2) {
-    if (selectedPlant.current == null) return
+    // if (selectedPlant.current == null) return
 
     const rx = mousePos.x - this.transform.x
     const ry = mousePos.y - this.transform.y
 
-    const x = Math.floor(rx / 16)
-    const y = Math.floor(ry / 16)
+    const x = Math.floor(rx / this.mapInfo.cellWidth)
+    const y = Math.floor(ry / this.mapInfo.cellHeight)
 
     if (y < 0 || x < 0) return
     if (y < 0) return
-    if (y >= 5 || x >= 9) return
-    if (y >= 5) return
+    if (
+      y >= this.mapInfo.verticalCellCount ||
+      x >= this.mapInfo.horizontalCellCount
+    )
+      return
+    if (y >= this.mapInfo.verticalCellCount) return
+
+    if (selectedPlant.current == null) return
 
     if (allPlants.includes(selectedPlant.current as PLANTS)) {
       this.#plantAPlant(x, y, selectedPlant.current as PLANTS)
@@ -171,46 +183,27 @@ export default class Board extends GameObject {
   }
 
   #plantAPlant(x: number, y: number, plant: PLANTS) {
-    if (this.#board[y][x].plant == null) {
+    if (
+      plantsInfo[plant].plantType === PLANT_TYPE.PLANT
+        ? this.#board[y][x].plant == null
+        : plantsInfo[plant].plantType === PLANT_TYPE.PLATFORM
+        ? this.#board[y][x].platform == null
+        : false
+    ) {
       if (this.#board[y][x].block == null) {
         if (plant === PLANTS.GRAVE_BUSTER) return
 
-        if (Math.random() < 0.5) {
-          this.#audioList.plant.play()
-        } else {
-          this.#audioList.plant2.play()
-        }
-        suns.current -= plantsInfo[plant].price
-        loadingSeeds.current[plant].current = 0
-
-        this.#board[y][x].plant = new plantsClasses[plant](
-          new Vector2(x * 16 + this.transform.x, y * 16 + this.transform.y)
-        )
-
-        this.#board[y][x].plant!.onDestroy = () => {
-          this.#plantDestroy(x, y)
-        }
-        selectedPlant.current = null
-      } else {
-        if (!(this.#board[y][x].block instanceof Tomb)) return
+        this.#setPlant(x, y, plant)
+        return
+      }
+      if (this.#board[y][x].block instanceof Tomb) {
         if (plant !== PLANTS.GRAVE_BUSTER) return
-        if (Math.random() < 0.5) {
-          this.#audioList.plant.play()
-        } else {
-          this.#audioList.plant2.play()
-        }
-        suns.current -= plantsInfo[plant].price
-        loadingSeeds.current[plant].current = 0
 
-        this.#board[y][x].plant = new plantsClasses[plant](
-          new Vector2(x * 16 + this.transform.x, y * 16 + this.transform.y),
-          this.#board[y][x].block as Tomb
+        this.#setPlant(x, y, plant)
+        this.#board[y][x].plant!.addEventListener('destroy', () =>
+          this.#board[y][x].block!.destroy()
         )
-
-        this.#board[y][x].plant!.onDestroy = () => {
-          this.#plantDestroy(x, y)
-        }
-        selectedPlant.current = null
+        return
       }
     }
   }
@@ -223,8 +216,54 @@ export default class Board extends GameObject {
     }
   }
 
+  #getPlantsCoords(x: number, y: number) {
+    return new Vector2(
+      x * this.mapInfo.cellWidth +
+        this.transform.x -
+        (16 - this.mapInfo.cellWidth),
+      y * this.mapInfo.cellHeight +
+        this.transform.y -
+        (16 - this.mapInfo.cellHeight)
+    )
+  }
+  #setPlant(x: number, y: number, plant: PLANTS) {
+    if (plantsInfo[plant].type !== this.#board[y][x].type) {
+      if (plantsInfo[plant].type === FLOOR_TYPE.DIRT) {
+        if (this.#board[y][x].platform == null) return
+      } else return
+    }
+    if (Math.random() < 0.5) {
+      this.#audioList.plant.play()
+    } else {
+      this.#audioList.plant2.play()
+    }
+
+    suns.current -= plantsInfo[plant].price
+    loadingSeeds.current[plant].current = 0
+
+    const newPlant = new plantsClasses[plant](
+      this.#getPlantsCoords(x, y).add(
+        new Vector2(0, plantsInfo[plant].type === FLOOR_TYPE.DIRT ? -4 : 0)
+      ),
+      y + 1
+    )
+
+    if (plant === PLANTS.LILY_PAD) {
+      newPlant.addEventListener('destroy', () => this.#platformDestroy(x, y))
+      this.#board[y][x].platform = newPlant
+    } else {
+      newPlant.addEventListener('destroy', () => this.#plantDestroy(x, y))
+      this.#board[y][x].plant = newPlant
+    }
+
+    selectedPlant.current = null
+  }
+
   #plantDestroy(x: number, y: number) {
     this.#board[y][x].plant = null
+  }
+  #platformDestroy(x: number, y: number) {
+    this.#board[y][x].platform = null
   }
 
   onGameLose() {}

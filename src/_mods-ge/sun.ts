@@ -85,10 +85,10 @@ export default class Sun extends GameObject {
       this.transform.y += m.y * Time.deltaTime
 
       if (
-        (this.transform.roundedX >= sunCounterPos.roundedX &&
-          this.transform.roundedY >= sunCounterPos.roundedY &&
-          this.transform.roundedX <= sunCounterPos.roundedX + 8 &&
-          this.transform.roundedY <= sunCounterPos.roundedY + 8) ||
+        (this.transform.x >= sunCounterPos.x &&
+          this.transform.y >= sunCounterPos.y &&
+          this.transform.x <= sunCounterPos.x + 8 &&
+          this.transform.y <= sunCounterPos.y + 8) ||
         this.transform.x < 0 ||
         this.transform.y < 0
       ) {

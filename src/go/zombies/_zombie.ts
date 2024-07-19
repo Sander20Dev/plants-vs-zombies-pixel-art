@@ -1,6 +1,8 @@
 import Entity from '../../_mods-ge/entity'
 import AnimatedSpritesList from '../../game-engine/nodes/animated-sprites-list'
-import AudioPlayer from '../../game-engine/nodes/audio-player'
+import AudioPlayer, {
+  MultipleAudioPlayer,
+} from '../../game-engine/nodes/audio-player'
 import Collision from '../../game-engine/nodes/collider'
 import Vector2 from '../../game-engine/utilities/vector2'
 import { GameObjectTypes } from '../../utilities/enums'
@@ -30,7 +32,7 @@ const [walkingMiddle1, walkingMiddle2, walkingMiddle3] = importSpriteSheet(
 export const zombieAnimation = {
   'z-normal-eat': {
     sprites: [eat1, eat2, eat1, eat3],
-    fps: 4,
+    fps: 2,
   },
   'z-normal': {
     sprites: [walking1, walking2, walking3, walking2],
@@ -42,7 +44,7 @@ export const zombieAnimation = {
       new Vector2(16),
       2
     ),
-    fps: 8,
+    fps: 1,
   },
   'z-arm': {
     sprites: [walkingMiddle1, walkingMiddle2, walkingMiddle3, walkingMiddle2],
@@ -57,9 +59,13 @@ export default class Zombie extends Entity {
 
   init() {
     this.animationList.onChangeAnimation = (c) => this.onChangeAnimation(c)
+    this.currentAnimation = this.animationList.currentAnimationName
   }
 
   currentAnimation = 'z-normal'
+
+  effectTimeRate = 1
+  zombieTimeRate = 1
 
   constructor(pos: Vector2, health: number, damage = 100) {
     super(GameObjectTypes.ZOMBIE, pos, health, damage)
@@ -69,11 +75,11 @@ export default class Zombie extends Entity {
 
       this.context.cold = effect != null
       if (effect === 'cold') {
-        this.localTimeRate = 0.5
+        this.effectTimeRate = 0.5
       } else if (effect === 'ice') {
-        this.localTimeRate = 0
+        this.effectTimeRate = 0
       } else {
-        this.localTimeRate = 1
+        this.effectTimeRate = 1
       }
     }
 
@@ -91,8 +97,8 @@ export default class Zombie extends Entity {
   }
 
   #audioList = {
-    chomp: new AudioPlayer('/audios/zombies/chomp.ogg'),
-    chomp2: new AudioPlayer('/audios/zombies/chomp2.ogg'),
+    chomp: new MultipleAudioPlayer('/audios/zombies/chomp.ogg'),
+    chomp2: new MultipleAudioPlayer('/audios/zombies/chomp2.ogg'),
     groan: new AudioPlayer('/audios/zombies/groan.ogg'),
     groan2: new AudioPlayer('/audios/zombies/groan2.ogg'),
     groan3: new AudioPlayer('/audios/zombies/groan3.ogg'),
@@ -122,7 +128,9 @@ export default class Zombie extends Entity {
     this,
     new Vector2(5, 3),
     new Vector2(5, 13),
-    GameObjectTypes.PLANT
+    GameObjectTypes.PLANT,
+    undefined,
+    { reversed: true }
   )
 
   animationList = new AnimatedSpritesList(
@@ -184,7 +192,7 @@ export default class Zombie extends Entity {
     this.animationList.animations[this.currentAnimation + '-eat'].onChange = (
       i
     ) => {
-      if (i === 1 || i === 3) return
+      if (i % 2 === 0) return
       if (Math.random() < 0.5) {
         this.#audioList.chomp.play()
       } else {
@@ -196,6 +204,8 @@ export default class Zombie extends Entity {
   }
 
   priority(): void {
+    this.localTimeRate = this.effectTimeRate * this.zombieTimeRate
+
     this.#attackedCounter.updater()
     this.effects.update()
     this.setAnimation()

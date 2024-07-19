@@ -17,10 +17,10 @@ export default class Collision extends NodeAbs {
     public scale: Vector2,
     mesh?: GameObjectTypes | GameObjectTypes[],
     onCollision?: (obj: GameObject) => void,
-    { detectInvulnerables = false } = {}
+    { detectInvulnerables = false, reversed = false } = {}
   ) {
     super()
-    this.options = { detectInvulnerables }
+    this.options = { detectInvulnerables, reversed }
     if (onCollision != null) {
       this.onCollision = function (obj) {
         onCollision(obj)
@@ -48,13 +48,6 @@ export default class Collision extends NodeAbs {
     )
 
     return collided
-    /*  ||
-      this.#detection(
-        from,
-        to,
-        this.relativeTransform,
-        this.relativeTransform.add(this.scale)
-      ) */
   }
 
   onCollision(obj: GameObject): void
@@ -64,7 +57,9 @@ export default class Collision extends NodeAbs {
 
   update() {
     if (this.mesh != null) {
-      const filteredMesh = Views.getAll(this.mesh)
+      const filteredMesh = this.options.reversed
+        ? Views.getAll(this.mesh).slice().reverse()
+        : Views.getAll(this.mesh)
 
       if (filteredMesh.length === 0) this.onUpdate()
 

@@ -1,4 +1,5 @@
-import { GameObject, canvas } from '../../game-engine/game-object'
+import { GameObject } from '../../game-engine/game-object'
+import { canvas } from '../../utilities/drawing'
 import Entity from '../../_mods-ge/entity'
 import AudioPlayer from '../../game-engine/nodes/audio-player'
 import Collision from '../../game-engine/nodes/collider'

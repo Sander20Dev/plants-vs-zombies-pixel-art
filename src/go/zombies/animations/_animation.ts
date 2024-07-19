@@ -10,9 +10,10 @@ export default class AnimationObject extends GameObject {
     pos: Vector2,
     srcs: SpriteTexture[],
     fps: number,
-    options?: { loop?: boolean }
+    options?: { loop?: boolean },
+    zIndex?: number
   ) {
-    super(GameObjectTypes.ANIMATION, pos)
+    super(GameObjectTypes.ANIMATION, pos, { zIndex })
     const animation = new AnimatedSprite(pos, srcs, fps, options)
     this.animation = animation
     this.nodes = [animation]

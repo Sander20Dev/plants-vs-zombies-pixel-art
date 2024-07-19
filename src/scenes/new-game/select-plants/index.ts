@@ -1,4 +1,4 @@
-import { canvas } from '../../../game-engine/game-object'
+import { canvas } from '../../../utilities/drawing'
 import SpriteTexture from '../../../game-engine/utilities/sprite'
 import Vector2 from '../../../game-engine/utilities/vector2'
 import { scenes } from '../../../manager/scenes-manager'

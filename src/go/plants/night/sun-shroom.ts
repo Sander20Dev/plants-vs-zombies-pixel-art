@@ -5,7 +5,7 @@ import Time from '../../../game-engine/utilities/time'
 import Vector2 from '../../../game-engine/utilities/vector2'
 import { Counter } from '../../../utilities/delta'
 import { PLANTS } from '../../../utilities/enums/plants'
-import { SunOfPlant } from '../sunflower'
+import { SunOfPlant } from '../day/sunflower'
 import NightPlant from './plant'
 
 const [smallIdle1, smallIdle2] = importSpriteSheet(
@@ -68,8 +68,8 @@ export default class SunShroom extends NightPlant {
 
   nodes = [this.animationList]
 
-  constructor(pos: Vector2) {
-    super(pos, PLANTS.SUN_SHROOM, 'small')
+  constructor(pos: Vector2, zIndex?: number) {
+    super(pos, PLANTS.SUN_SHROOM, 'small', zIndex)
   }
 
   start(): void {

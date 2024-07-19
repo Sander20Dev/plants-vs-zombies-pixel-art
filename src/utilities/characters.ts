@@ -402,8 +402,8 @@ export function drawCharacter(chars: string, pos: Vector2) {
       char.pos.y,
       char.size.x,
       char.size.y,
-      pos.roundedX + currentX,
-      pos.roundedY,
+      pos.x + currentX,
+      pos.y,
       char.size.x,
       char.size.y
     )
@@ -424,11 +424,8 @@ function drawSpecialChar(
     toChar.pos.y,
     toChar.size.x,
     toChar.size.y,
-    pos.roundedX +
-      currentX +
-      (fromChar.size.x - 1) / 2 -
-      (toChar.size.x - 1) / 2,
-    pos.roundedY - toChar.size.y - 1,
+    pos.x + currentX + (fromChar.size.x - 1) / 2 - (toChar.size.x - 1) / 2,
+    pos.y - toChar.size.y - 1,
     toChar.size.x,
     toChar.size.y
   )
@@ -438,8 +435,8 @@ function drawSpecialChar(
     fromChar.pos.y,
     fromChar.size.x,
     fromChar.size.y,
-    pos.roundedX + currentX,
-    pos.roundedY,
+    pos.x + currentX,
+    pos.y,
     fromChar.size.x,
     fromChar.size.y
   )

@@ -75,7 +75,7 @@ const poleVaultingZombieAnimation = {
   },
   'walking-eat': {
     sprites: [eat1, eat2, eat1, eat3],
-    fps: 4,
+    fps: 2,
   },
   middle: {
     sprites: [middle1, middle2, middle1, middle3],
@@ -87,7 +87,7 @@ const poleVaultingZombieAnimation = {
       new Vector2(16),
       2
     ),
-    fps: 8,
+    fps: 1,
   },
 }
 
@@ -187,7 +187,7 @@ export default class PoleVaultingZombie extends Zombie {
 
   nodes: AnimatedSpritesList[] = [this.animationList]
 
-  onUpdate = () => {
+  update() {
     this.detectCollision()
     if (!this.jumped) {
       if (this.velocity === 'very-fast') {
@@ -198,8 +198,8 @@ export default class PoleVaultingZombie extends Zombie {
         this.transform.x -= ZOMBIE_SPEED * Time.deltaTime
       }
     } else {
-      super.onUpdate()
     }
+    super.update()
   }
 }
 

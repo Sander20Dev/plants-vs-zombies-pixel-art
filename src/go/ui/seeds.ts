@@ -14,16 +14,16 @@ import Time from '../../game-engine/utilities/time'
 import { Theme } from '../../utilities/enums/theme'
 import { importSpriteSheet } from '../../game-engine/utilities/sprite'
 import Shovel from './buttons/shovel'
-import AnimatedSprite from '../../game-engine/nodes/animated-sprite'
 
-const seeds = importSpriteSheet(
-  '/sprites/ui/seeds/seeds.png',
+const spritePlants = importSpriteSheet(
+  '/sprites/ui/seeds/seeds-pack.png',
   new Vector2(24, 16),
   8,
-  2
+  3
 )
+
 export const images = allPlants.map((plant, i) => {
-  return { img: seeds[i], plant }
+  return { img: spritePlants[i], plant }
 })
 
 const readysetplant = importSpriteSheet(
@@ -52,7 +52,7 @@ export default class Seeds extends GameObject {
     }
 
     this.seeds = seeds.slice(0, 6)
-    this.audioList.ready.audio.play().then(() => {
+    this.audioList.ready.play().then(() => {
       this.#initCounter = true
     })
 
@@ -105,34 +105,16 @@ export default class Seeds extends GameObject {
   }
 }
 
-const allPlantsSprites = allPlants.map((plant) => {
-  return importSpriteSheet(
-    '/sprites/ui/seeds/' + plant + '.png',
-    new Vector2(24, 16),
-    8
-  )
-})
-
 class Seed extends GameObject {
   sprite
-
-  activeAnimation
+  activated = false
 
   constructor(pos: Vector2, public plant: PLANTS) {
     super(GameObjectTypes.UI, pos)
 
     const index = allPlants.indexOf(plant)
 
-    this.sprite = allPlantsSprites[index][0]
-
-    this.activeAnimation = new AnimatedSprite(
-      this.transform,
-      allPlantsSprites[index],
-      8,
-      { loop: false }
-    )
-    this.activeAnimation.ignore = true
-    this.activeAnimation.filter = 'saturate(1.3) brightness(1.3) contrast(0.9)'
+    this.sprite = spritePlants[index]
 
     this.nodes.push(
       new Clickable(this.transform, new Vector2(24, 96), () => {
@@ -144,15 +126,12 @@ class Seed extends GameObject {
           return
 
         if (selectedPlant.current !== this.plant) {
-          this.activeAnimation.ignore = false
-          this.activeAnimation.setAnimationIndex(0)
-          this.activeAnimation.play()
+          this.activated = true
           selectedPlant.current = this.plant
         } else {
           selectedPlant.current = null
         }
-      }),
-      this.activeAnimation
+      })
     )
   }
 
@@ -173,10 +152,8 @@ class Seed extends GameObject {
 
       this.sprite.draw(this.transform.x, this.transform.y)
     } else if (this.plant === selectedPlant.current) {
-      if (this.activeAnimation.ignore) {
-        ctx.filter = 'saturate(150%) brightness(60%)'
-        this.sprite.draw(this.transform.x, this.transform.y)
-      }
+      ctx.filter = 'saturate(150%) brightness(90%)'
+      this.sprite.draw(this.transform.x, this.transform.y)
     } else if (timer.current < timer.timeout) {
       const difference = Math.round((16 * timer.current) / timer.timeout)
       ctx.filter = 'grayscale(100%) brightness(30%)'
@@ -231,8 +208,7 @@ class Seed extends GameObject {
   update(): void {
     if (this.lastSelector !== selectedPlant.current) {
       if (this.lastSelector === this.plant) {
-        this.activeAnimation.ignore = true
-        this.activeAnimation.setAnimationIndex(0)
+        this.activated = false
       }
 
       this.lastSelector = selectedPlant.current

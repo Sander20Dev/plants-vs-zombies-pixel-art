@@ -22,11 +22,8 @@ export default class Sprite extends NodeAbs {
   draw() {
     ctx.filter = this.filters
 
-    if (this.options.rawCoords === true) {
-      this.#sprite.draw(this.transform.x, this.transform.y)
-    } else {
-      this.#sprite.draw(this.transform.roundedX, this.transform.roundedY)
-    }
+    this.#sprite.drawSprite(this.transform)
+
     ctx.filter = 'none'
   }
 }

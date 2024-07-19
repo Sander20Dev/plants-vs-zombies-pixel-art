@@ -5,7 +5,20 @@ import NodeAbs from './nodes/node'
 import Vector2 from './utilities/vector2'
 
 export const canvas = document.querySelector('canvas')!
+canvas.width = 1920
+canvas.height = 1120
+
 export const ctx = canvas.getContext('2d')!
+ctx.imageSmoothingEnabled = false
+
+export interface IGOOptions {
+  zIndex?: number
+}
+
+interface GOEvents {
+  update(delta: number): void
+  destroy(): void
+}
 
 export abstract class GameObject {
   localTimeRate = 1
@@ -14,22 +27,29 @@ export abstract class GameObject {
   transform = Vector2.ZERO
   collision = new Collision(this, Vector2.ZERO, Vector2.ZERO)
 
-  orderIndex: number
-  zIndex: number
+  zIndex: number = 0
 
   nodes: NodeAbs[] = []
 
-  constructor(public type: GameObjectTypes, pos: Vector2, zIndex?: number) {
-    this.orderIndex = Views.instanceObject(this)
-    this.transform = pos
-    this.zIndex = zIndex ?? 0
+  events: { [P in keyof GOEvents]: GOEvents[P][] } = {
+    update: [],
+    destroy: [],
   }
 
-  getComponent<T extends typeof NodeAbs>(type: T) {
-    for (const node of this.nodes) {
-      if (node instanceof type) return node as T['prototype']
+  constructor(
+    public type: GameObjectTypes,
+    pos: Vector2,
+    options?: IGOOptions
+  ) {
+    this.transform = pos
+    if (options?.zIndex) {
+      this.zIndex = options.zIndex
     }
-    return null
+    Views.instanceObject(this)
+  }
+
+  addEventListener<T extends keyof GOEvents>(event: T, cb: GOEvents[T]) {
+    this.events[event].push(cb)
   }
 
   nodesUpdate(nodeUpdate: (tr?: number) => void) {
@@ -44,6 +64,7 @@ export abstract class GameObject {
 
   destroy() {
     this.onDestroy()
+    this.events.destroy.forEach((cb) => cb())
 
     for (const node of this.nodes) {
       node.destroy()

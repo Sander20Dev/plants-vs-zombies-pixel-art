@@ -1,7 +1,7 @@
 import { GameObject } from '../game-object'
 import { GameObjectTypes } from '../../utilities/enums'
 
-const gameObjects: Record<GameObjectTypes, GameObject[]> = {
+const gameObjectsByZIndex: Record<GameObjectTypes, GameObject[][]> = {
   [GameObjectTypes.BACKGROUND]: [],
   [GameObjectTypes.PLANT]: [],
   [GameObjectTypes.ZOMBIE]: [],
@@ -10,27 +10,43 @@ const gameObjects: Record<GameObjectTypes, GameObject[]> = {
   [GameObjectTypes.SUN]: [],
   [GameObjectTypes.UI]: [],
 }
+// const gameObjects: Record<GameObjectTypes, GameObject[]> = {
+//   [GameObjectTypes.BACKGROUND]: [],
+//   [GameObjectTypes.PLANT]: [],
+//   [GameObjectTypes.ZOMBIE]: [],
+//   [GameObjectTypes.ANIMATION]: [],
+//   [GameObjectTypes.PROJECTIL]: [],
+//   [GameObjectTypes.SUN]: [],
+//   [GameObjectTypes.UI]: [],
+// }
 
 export class Views {
   static get(type: GameObjectTypes) {
-    return gameObjects[type]
+    // return gameObjects[type]
+    return gameObjectsByZIndex[type].flat()
   }
   static getAll(type: GameObjectTypes[]) {
-    const all = type.map((t) => Views.get(t))
-    const a: GameObject[] = []
-    for (let i = 0; i < all.length; i++) {
-      for (let j = 0; j < all[i].length; j++) {
-        a.push(all[i][j])
-      }
-    }
-    return a
+    // const all = type.map((t) => Views.get(t))
+    // const a: GameObject[] = []
+    // for (let i = 0; i < all.length; i++) {
+    //   for (let j = 0; j < all[i].length; j++) {
+    //     a.push(all[i][j])
+    //   }
+    // }
+    // return a
+    const all = type.flatMap((t) => gameObjectsByZIndex[t].flat())
+    return all
   }
 
   static destroyObject(gb: GameObject) {
-    const index = Views.get(gb.type).indexOf(gb)
+    const zIndex = gb.zIndex
+    const type = gb.type
+
+    const index = gameObjectsByZIndex[type][zIndex].indexOf(gb)
+
     if (index < 0) return
 
-    Views.get(gb.type).splice(index, 1)
+    gameObjectsByZIndex[type][zIndex].splice(index, 1)
   }
 
   static clean() {
@@ -38,31 +54,29 @@ export class Views {
       gb.destroy()
     }
 
-    for (const key of Object.keys(gameObjects)) {
-      gameObjects[+key as GameObjectTypes] = []
+    for (const key of Object.keys(gameObjectsByZIndex)) {
+      gameObjectsByZIndex[+key as GameObjectTypes] = []
     }
   }
 
   static instanceObject(gb: GameObject) {
-    gameObjects[gb.type].push(gb)
-
-    gameObjects[gb.type].sort((a, b) => {
-      if (a.zIndex !== b.zIndex) return a.orderIndex - b.orderIndex
-      return a.zIndex - b.zIndex
-    })
-
-    return gameObjects[gb.type].indexOf(gb)
+    if (gameObjectsByZIndex[gb.type][gb.zIndex] == null) {
+      gameObjectsByZIndex[gb.type][gb.zIndex] = []
+    }
+    gameObjectsByZIndex[gb.type][gb.zIndex].push(gb)
   }
 
   static all() {
-    return [
-      ...gameObjects[GameObjectTypes.BACKGROUND],
-      ...gameObjects[GameObjectTypes.PLANT],
-      ...gameObjects[GameObjectTypes.ZOMBIE],
-      ...gameObjects[GameObjectTypes.ANIMATION],
-      ...gameObjects[GameObjectTypes.PROJECTIL],
-      ...gameObjects[GameObjectTypes.SUN],
-      ...gameObjects[GameObjectTypes.UI],
+    const type = [
+      GameObjectTypes.BACKGROUND,
+      GameObjectTypes.PLANT,
+      GameObjectTypes.ZOMBIE,
+      GameObjectTypes.ANIMATION,
+      GameObjectTypes.PROJECTIL,
+      GameObjectTypes.SUN,
+      GameObjectTypes.UI,
     ]
+
+    return Views.getAll(type)
   }
 }

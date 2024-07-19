@@ -29,7 +29,7 @@ const [wm1, wm2, wm3] = importSpriteSheet(
 const coneheadZombieAnimation = {
   'c-full-eat': {
     sprites: [e1, e2, e1, e3],
-    fps: 4,
+    fps: 2,
   },
   'c-full': {
     sprites: [w1, w2, w3, w2],
@@ -37,7 +37,7 @@ const coneheadZombieAnimation = {
   },
   'c-middle-eat': {
     sprites: [em1, em2, em1, em3],
-    fps: 4,
+    fps: 2,
   },
   'c-middle': {
     sprites: [wm1, wm2, wm3, wm2],

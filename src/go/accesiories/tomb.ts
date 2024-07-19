@@ -57,7 +57,7 @@ export default class Tomb extends GameObject {
   )
 
   constructor(pos: Vector2) {
-    super(GameObjectTypes.BACKGROUND, pos, 10)
+    super(GameObjectTypes.BACKGROUND, pos, { zIndex: 10 })
 
     this.nodes.push(this.animationList)
     this.animationList.currentAnimation.play()

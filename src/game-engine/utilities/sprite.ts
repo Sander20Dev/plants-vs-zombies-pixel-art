@@ -4,12 +4,31 @@ import Vector2 from './vector2'
 
 export default class SpriteTexture {
   img: HTMLImageElement
+  size: Vector2
+
+  scale = 1
+
   constructor(
     src: string | HTMLImageElement,
     public sub: Vector2 = Vector2.ZERO,
-    public size?: Vector2
+    size?: Vector2
   ) {
     this.img = src instanceof HTMLImageElement ? src : getImage(src)
+    this.size = size ?? new Vector2(this.img.width, this.img.height)
+  }
+
+  drawSprite(position: Vector2, scale = this.size.multiply(this.scale)) {
+    ctx.drawImage(
+      this.img,
+      this.sub.x,
+      this.sub.y,
+      this.size.x,
+      this.size.y,
+      position.x,
+      position.y,
+      scale.x,
+      scale.y
+    )
   }
 
   draw(x: number, y: number) {

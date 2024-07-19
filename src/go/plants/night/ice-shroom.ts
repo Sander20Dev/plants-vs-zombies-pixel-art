@@ -30,8 +30,8 @@ export default class IceShroom extends NightPlant {
     'sleep'
   )
 
-  constructor(pos: Vector2) {
-    super(pos, PLANTS.ICE_SHROOM)
+  constructor(pos: Vector2, zIndex?: number) {
+    super(pos, PLANTS.ICE_SHROOM, undefined, zIndex)
     this.animationList.animations.idle.onEnd = () => {
       const zombies = Views.get(GameObjectTypes.ZOMBIE).filter(
         (n) => n instanceof Zombie

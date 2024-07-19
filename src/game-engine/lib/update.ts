@@ -1,4 +1,4 @@
-import { canvas, ctx } from '../game-object'
+import { canvas, ctx } from '../../utilities/drawing'
 import { Views } from './loader'
 import { inputController } from '../utilities/input'
 import Time from '../utilities/time'
@@ -54,6 +54,7 @@ function update(time: number) {
 
     if (timeRate !== 0) {
       gameObj.update()
+      gameObj.events.update.forEach((event) => event(Time.deltaTime))
     }
 
     if (Time.timeRate !== 0) {
@@ -63,6 +64,30 @@ function update(time: number) {
     } else {
       gameObj.priority()
     }
+    ctx.beginPath()
+    ctx.fillStyle = '#4C73E488'
+    // ctx.moveTo(gameObj.transform.x + gameObj.collision.transform.x,
+    //   gameObj.transform.y + gameObj.collision.transform.y)
+    // ctx.lineTo(gameObj.transform.x + gameObj.collision.transform.x + gameObj.collision.scale.x, gameObj.transform.y + gameObj.collision.transform.y)
+    // ctx.lineTo(gameObj.transform.x + gameObj.collision.transform.x + gameObj.collision.scale.x, gameObj.transform.y + gameObj.collision.transform.y + gameObj.collision.scale.y)
+    // ctx.lineTo(gameObj.transform.x + gameObj.collision.transform.x, gameObj.transform.y + gameObj.collision.transform.y + gameObj.collision.scale.y)
+    // ctx.lineTo(gameObj.transform.x + gameObj.collision.transform.x, gameObj.transform.y + gameObj.collision.transform.y)
+    // ctx.fill()
+    ctx.lineWidth = 0.5
+    ctx.strokeStyle = '#3D4E7E88'
+    ctx.strokeRect(
+      gameObj.transform.x + gameObj.collision.transform.x,
+      gameObj.transform.y + gameObj.collision.transform.y,
+      gameObj.collision.scale.x,
+      gameObj.collision.scale.y
+    )
+    ctx.fillRect(
+      gameObj.transform.x + gameObj.collision.transform.x,
+      gameObj.transform.y + gameObj.collision.transform.y,
+      gameObj.collision.scale.x,
+      gameObj.collision.scale.y
+    )
+    ctx.closePath()
     gameObj.draw()
   }
 

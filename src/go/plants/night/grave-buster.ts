@@ -4,8 +4,8 @@ import Collision from '../../../game-engine/nodes/collider'
 import { importSpriteSheet } from '../../../game-engine/utilities/sprite'
 import Time from '../../../game-engine/utilities/time'
 import Vector2 from '../../../game-engine/utilities/vector2'
+import { Counter } from '../../../utilities/delta'
 import { PLANTS } from '../../../utilities/enums/plants'
-import Tomb from '../../accesiories/tomb'
 import Plant from '../plant'
 
 const eating = importSpriteSheet(
@@ -28,18 +28,22 @@ export default class GraveBuster extends Plant {
     new Vector2(11, 13)
   )
 
-  constructor(pos: Vector2, public tomb: Tomb) {
+  audiosEnd = new Counter(4, () => {
+    this.destroy()
+  })
+
+  constructor(pos: Vector2, zIndex: number = 0) {
     super(pos, PLANTS.GRAVE_BUSTER)
     this.audio.play()
     this.animation.play()
-    this.audio.audio.onended = () => {
-      this.destroy()
-      tomb.destroy()
-    }
+    this.audiosEnd.play()
+
     this.nodes.push(this.animation)
   }
 
   update(): void {
+    this.audiosEnd.updater()
+
     if (this.animation.transform.y < this.transform.y) {
       this.animation.transform.y += Time.deltaTime / 2
     } else if (this.animation.transform.y > this.transform.y) {

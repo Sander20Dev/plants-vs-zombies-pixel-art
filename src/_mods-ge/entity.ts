@@ -1,5 +1,5 @@
 import { GameObjectTypes } from '../utilities/enums'
-import { GameObject } from '../game-engine/game-object'
+import { GameObject, IGOOptions } from '../game-engine/game-object'
 import Vector2 from '../game-engine/utilities/vector2'
 
 export default class Entity extends GameObject {
@@ -7,9 +7,10 @@ export default class Entity extends GameObject {
     type: GameObjectTypes,
     pos: Vector2,
     public health: number,
-    public damage = 0
+    public damage = 0,
+    options?: IGOOptions
   ) {
-    super(type, pos)
+    super(type, pos, options)
   }
 
   attack(damage: number) {

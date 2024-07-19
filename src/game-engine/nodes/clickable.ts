@@ -1,5 +1,5 @@
 import Time from '../utilities/time'
-import { canvas } from '../game-object'
+import { canvas } from '../../utilities/drawing'
 import Vector2 from '../utilities/vector2'
 import NodeAbs from './node'
 
@@ -8,8 +8,8 @@ let clicker: Clickable[] = []
 canvas.addEventListener('click', (ev) => {
   const rect = canvas.getBoundingClientRect()
 
-  const x = Math.floor((canvas.width * (ev.pageX - rect.x)) / rect.width)
-  const y = Math.floor((canvas.height * (ev.pageY - rect.y)) / rect.height)
+  const x = Math.floor((Vector2.SCREEN.x * (ev.pageX - rect.x)) / rect.width)
+  const y = Math.floor((Vector2.SCREEN.y * (ev.pageY - rect.y)) / rect.height)
 
   let detect = false
 
@@ -31,8 +31,8 @@ canvas.addEventListener('click', (ev) => {
 canvas.addEventListener('mousedown', (ev) => {
   const rect = canvas.getBoundingClientRect()
 
-  const x = Math.floor((canvas.width * (ev.pageX - rect.x)) / rect.width)
-  const y = Math.floor((canvas.height * (ev.pageY - rect.y)) / rect.height)
+  const x = Math.floor((Vector2.SCREEN.x * (ev.pageX - rect.x)) / rect.width)
+  const y = Math.floor((Vector2.SCREEN.y * (ev.pageY - rect.y)) / rect.height)
 
   for (const click of clicker) {
     if (Time.timeRate === 0 && !click.invulnerable) return

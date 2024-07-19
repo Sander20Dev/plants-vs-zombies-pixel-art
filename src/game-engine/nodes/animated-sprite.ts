@@ -78,16 +78,16 @@ export default class AnimatedSprite extends NodeAbs {
       ctx.scale(-1, 1)
 
       this.#animations[this.currentAnimation].draw(
-        -this.transform.roundedX -
+        -this.transform.x -
           (this.#animations[this.currentAnimation].size
             ? this.#animations[this.currentAnimation].size!.x
             : 16),
-        this.transform.roundedY
+        this.transform.y
       )
     } else {
       this.#animations[this.currentAnimation].draw(
-        this.transform.roundedX,
-        this.transform.roundedY
+        this.transform.x,
+        this.transform.y
       )
     }
 

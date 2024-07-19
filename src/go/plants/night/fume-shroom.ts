@@ -1,5 +1,6 @@
 import { GameObject } from '../../../game-engine/game-object'
 import AnimatedSpritesList from '../../../game-engine/nodes/animated-sprites-list'
+import { MultipleAudioPlayer } from '../../../game-engine/nodes/audio-player'
 import Collision from '../../../game-engine/nodes/collider'
 import Sprite from '../../../game-engine/nodes/sprite'
 import { importSpriteSheet } from '../../../game-engine/utilities/sprite'
@@ -55,13 +56,13 @@ export default class FumeShroom extends NightPlant {
 
   maxPos
 
-  constructor(pos: Vector2) {
-    super(pos, PLANTS.PUFF_SHROOM)
+  constructor(pos: Vector2, zIndex?: number) {
+    super(pos, PLANTS.PUFF_SHROOM, undefined, zIndex)
 
     this.animationList.animations.idle.onChange = (i) => {
       const attacking = hasAZombie(
-        this.transform.roundedX + 9,
-        this.transform.roundedY,
+        this.transform.x + 9,
+        this.transform.y,
         this.maxPos.add(new Vector2(-this.transform.x - 9, 0)).x,
         16
       )
@@ -75,7 +76,7 @@ export default class FumeShroom extends NightPlant {
     }
 
     this.maxPos = new Vector2(
-      Math.min(this.transform.roundedX + 80, 192),
+      Math.min(this.transform.x + 80, 192),
       this.transform.y
     )
 
@@ -109,9 +110,14 @@ export default class FumeShroom extends NightPlant {
       this.#fumeSpore.sprite.filters =
         'opacity(' + (i === 0 ? 100 : 100 / i) + '%)'
 
+      if (this.#fumeSpore.hide) {
+        this.fume.play()
+      }
       this.#fumeSpore.hide = false
     }
   }
+
+  fume = new MultipleAudioPlayer('/audios/plants/fume-shroom/fume.ogg')
 
   update(): void {
     this.#fumeSporeManager()
@@ -135,7 +141,7 @@ export class FumeSpore extends GameObject {
     this.nodes = [this.sprite]
 
     this.maxPos = new Vector2(
-      Math.min(this.plantPos.roundedX + 80, 192),
+      Math.min(this.plantPos.x + 80, 192),
       this.transform.y
     )
 
@@ -149,8 +155,8 @@ export class FumeSpore extends GameObject {
     if (this.hide) return
 
     const zombies = getCollide(
-      this.plantPos.roundedX + 9,
-      this.plantPos.roundedY,
+      this.plantPos.x + 9,
+      this.plantPos.y,
       this.maxPos.add(new Vector2(-this.plantPos.x - 9, 0)).x,
       16,
       GameObjectTypes.ZOMBIE

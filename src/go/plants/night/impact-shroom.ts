@@ -64,8 +64,8 @@ export default class ImpactShroom extends NightPlant {
     GameObjectTypes.ZOMBIE
   )
 
-  constructor(pos: Vector2) {
-    super(pos, PLANTS.IMPACT_SHROOM)
+  constructor(pos: Vector2, zIndex?: number) {
+    super(pos, PLANTS.IMPACT_SHROOM, undefined, zIndex)
 
     this.wavesAnimation = new AnimatedSprite(
       this.transform.add(new Vector2(-16, -16)),

@@ -1,4 +1,5 @@
 import AnimatedSpritesList from '../../../game-engine/nodes/animated-sprites-list'
+import { MultipleAudioPlayer } from '../../../game-engine/nodes/audio-player'
 import Collision from '../../../game-engine/nodes/collider'
 import SpriteTexture, {
   importSpriteSheet,
@@ -42,13 +43,13 @@ export default class PuffShroom extends NightPlant {
 
   maxPos
 
-  constructor(pos: Vector2) {
-    super(pos, PLANTS.PUFF_SHROOM)
+  constructor(pos: Vector2, zIndex?: number) {
+    super(pos, PLANTS.PUFF_SHROOM, undefined, zIndex)
     this.animationList.animations.idle.onChange = (index) => {
       if (index === 3) {
         this.#attacking = hasAZombie(
-          this.transform.roundedX + 7,
-          this.transform.roundedY,
+          this.transform.x + 7,
+          this.transform.y,
           this.maxPos.add(new Vector2(-this.transform.x - 7, 0)).x,
           16
         )
@@ -64,7 +65,7 @@ export default class PuffShroom extends NightPlant {
     }
 
     this.maxPos = new Vector2(
-      Math.min(this.transform.roundedX + 64, 200),
+      Math.min(this.transform.x + 64, 200),
       this.transform.y
     )
 
@@ -77,12 +78,14 @@ export default class PuffShroom extends NightPlant {
     new Vector2(7, 7)
   )
 
+  puff = new MultipleAudioPlayer('/audios/effect/puff.ogg')
   #generateASpore() {
     // if (Math.random() < 0.5) {
     //   this.#audiosList.throw.play()
     // } else {
     //   this.#audiosList.throw2.play()
     // }
+    this.puff.play()
     new Spore(
       new Vector2(this.transform.x + 11, this.transform.y + 11),
       this.maxPos

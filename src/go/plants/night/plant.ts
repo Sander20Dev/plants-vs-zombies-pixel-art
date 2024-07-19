@@ -13,8 +13,13 @@ export default class NightPlant extends Plant {
 
   zzz = new ZZZ(this.transform.add(new Vector2(8, -4)))
 
-  constructor(pos: Vector2, plant: PLANTS, public startAnimation = 'idle') {
-    super(pos, plant)
+  constructor(
+    pos: Vector2,
+    plant: PLANTS,
+    public startAnimation = 'idle',
+    zIndex?: number
+  ) {
+    super(pos, plant, zIndex)
     this.isNightPlant = true
     this.sleeping = Theme.NIGHT !== currentTheme.current
 

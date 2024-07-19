@@ -29,7 +29,7 @@ const [walkingMiddle1, walkingMiddle2, walkingMiddle3] = importSpriteSheet(
 const bucketheadZombieAnimation = {
   'b-full-eat': {
     sprites: [eat1, eat2, eat1, eat3],
-    fps: 4,
+    fps: 2,
   },
   'b-full': {
     sprites: [walking1, walking2, walking3, walking2],
@@ -37,7 +37,7 @@ const bucketheadZombieAnimation = {
   },
   'b-middle-eat': {
     sprites: [eatMiddle1, eatMiddle2, eatMiddle1, eatMiddle3],
-    fps: 4,
+    fps: 2,
   },
   'b-middle': {
     sprites: [walkingMiddle1, walkingMiddle2, walkingMiddle3, walkingMiddle2],

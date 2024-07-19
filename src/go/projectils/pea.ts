@@ -1,5 +1,5 @@
 import Entity from '../../_mods-ge/entity'
-import { GameObject, canvas } from '../../game-engine/game-object'
+import { GameObject } from '../../game-engine/game-object'
 import AudioPlayer from '../../game-engine/nodes/audio-player'
 import Collision from '../../game-engine/nodes/collider'
 import Sprite from '../../game-engine/nodes/sprite'
@@ -49,6 +49,6 @@ export default class Pea extends GameObject {
   update(): void {
     this.transform.x += Time.deltaTime * PEA_VELOCITY
 
-    if (this.transform.x >= canvas.width) this.destroy()
+    if (this.transform.x >= Vector2.SCREEN.x) this.destroy()
   }
 }
